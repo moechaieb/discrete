@@ -23,20 +23,19 @@ Or install it yourself as:
 This project is a work in progress and more structures and algorithms will be implemented:
 
 Structures:
-
--[] Sets (finite and infinite)
--[] Set Comprehensions (for sets of all other constructs)
--[] Logic Propositions (first-order and second-order)
--[] Specific Graphs (Bipratite, Directed, Trees, etc...)
--[] Graph Constructs (paths)
--[] Natural numbers and Integer numbers
--[] Mappings (injections, surjections, bijections between two sets)
+- [ ] Sets (finite and infinite)
+- [ ] Set Comprehensions (for sets of all other constructs)
+- [ ] Logic Propositions (first-order and second-order)
+- [ ] Specific Graphs (Bipratite, Directed, Trees, etc...)
+- [ ] Graph Constructs (paths)
+- [ ] Natural numbers and Integer numbers
+- [ ] Mappings (injections, surjections, bijections between two sets)
 
 Algorithms:
 
--[] Graph algorithms: search, traversal, colouring
--[] Approximation algorithms
--[] Optimization algorithms
+- [ ] Graph algorithms: search, traversal, colouring
+- [ ] Approximation algorithms
+- [ ] Optimization algorithms
 
 ## Usage
 
