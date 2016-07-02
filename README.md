@@ -1,8 +1,6 @@
 # Math::Discrete
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/discrete`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+A library and DSL for discrete mathematical structures and algorithms
 
 ## Installation
 
@@ -20,9 +18,29 @@ Or install it yourself as:
 
     $ gem install discrete
 
+## Feature List
+
+This project is a work in progress and more structures and algorithms will be implemented:
+
+Structures:
+
+-[] Sets (finite and infinite)
+-[] Set Comprehensions (for sets of all other constructs)
+-[] Logic Propositions (first-order and second-order)
+-[] Specific Graphs (Bipratite, Directed, Trees, etc...)
+-[] Graph Constructs (paths)
+-[] Natural numbers and Integer numbers
+-[] Mappings (injections, surjections, bijections between two sets)
+
+Algorithms:
+
+-[] Graph algorithms: search, traversal, colouring
+-[] Approximation algorithms
+-[] Optimization algorithms
+
 ## Usage
 
-TODO: Write usage instructions here
+Work In Progress.
 
 ## Development
 
@@ -32,7 +50,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/discrete. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/mac-adam-chaieb/discrete. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
 
 
 ## License

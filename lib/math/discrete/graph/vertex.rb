@@ -1,14 +1,14 @@
-class Vertex
+class Math::Discrete::Graph::Vertex
   attr_accessor :label
   attr_reader :graph, :adjacent_vertices
 
-  def self.from_label(label)
+  def self.build_from_label(label)
     new label: label
   end
 
   def initialize(label: nil)
     @graph = nil
-    @label = label || id
+    @label = label
     @adjacent_vertices = [].to_set
   end
 
@@ -26,4 +26,3 @@ class Vertex
     label == other_vertex.label
   end
 end
-Node = Vertex

@@ -1,18 +1,18 @@
-class Edge
-  attr_reader :first, :second
+class Math::Discrete::Graph::Edge
+  attr_reader :from, :to
   attr_accessor :graph
 
-  def initialize(first: , second:)
-    raise Math::Discrete::TypeError, 'first must be of type Math::Discrete::Graph::Vertex' unless first.is_a? Vertex
-    raise Math::Discrete::TypeError, 'second must be of type Math::Discrete::Graph::Vertex' unless second.is_a? Vertex
+  def initialize(from: , to:)
+    raise Math::Discrete::TypeError, 'from must be of type Math::Discrete::Graph::Vertex' unless from.is_a? Vertex
+    raise Math::Discrete::TypeError, 'to must be of type Math::Discrete::Graph::Vertex' unless to.is_a? Vertex
 
-    @first = first
-    @second = second
+    @from = from
+    @to = to
     @graph = nil
   end
 
   def set_graph!(graph)
-    raise Math::Discrete::TypeError, 'first must be of type Math::Discrete::Graph' unless graph.is_a? Graph
+    raise Math::Discrete::TypeError, 'from must be of type Math::Discrete::Graph' unless graph.is_a? Graph
 
     @graph = graph
   end
@@ -22,6 +22,6 @@ class Edge
   end
 
   def to_set
-    [first, second].to_set
+    [from, to].to_set
   end
 end

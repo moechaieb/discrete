@@ -6,24 +6,24 @@ class Math::Discrete::Graph
 
   attr_reader :vertices, :edges, :name
 
-  def initialize(name, vertices: [].to_set, edges: [].to_set)
+  def self.build_from_sets(vertices: [].to_set, edges: [].to_set)
     raise Math::Discrete::TypeError, 'vertices must be of type Set' unless vertices.is_a? Set
     raise Math::Discrete::TypeError, 'edges must be of type Set' unless edges.is_a? Set
 
-    @name = name
-    @vertices = [].to_set
-    @edges = [].to_set
+    graph = new
 
-    vertices = vertices.map { |label| Vertex.from_label label }
-    add_vertices! vertices
+    vertices = vertices.map { |label| Vertex.build_from_label label }
+    graph.add_vertices! vertices
 
-    edges = edges.map do |first, second|
+    edges = edges.map do |from, to|
       Edge.new(
-        first: find_vertex_by_label!(first),
-        second: find_vertex_by_label!(second)
+        from: find_vertex_by_label!(from),
+        to: find_vertex_by_label!(to)
       )
     end
-    add_edges! edges
+    graph.add_edges! edges
+
+    graph
   end
 
   def add_vertex!(vertex)
@@ -43,7 +43,7 @@ class Math::Discrete::Graph
   end
 
   def add_nodes!(nodes)
-    add_nodes!(nodes)
+    add_vertices!(nodes)
   end
 
   def add_edge!(edge)
@@ -51,22 +51,14 @@ class Math::Discrete::Graph
     raise Math::Discrete::TypeError, 'edge already exists in graph' unless unique_edge? edge
 
     edge.set_graph! self
-    edge.first.add_adjacent_vertex edge.second
-    edge.second.add_adjacent_vertex edge.first
+    edge.from.add_adjacent_vertex edge.to
+    edge.to.add_adjacent_vertex edge.from
 
     @edges.add edge
   end
 
   def add_edges!(edges)
     edges.each { |edge| add_edge! edge }
-  end
-
-  def find_by_id!(id)
-    result = @vertices.find { |vertex| vertex.id == id }
-
-    raise VertexNotFound, "could not find a vertex with id=#{id}" if result.nil?
-
-    result
   end
 
   def find_vertex_by_label!(label)
@@ -85,8 +77,8 @@ class Math::Discrete::Graph
     result
   end
 
-  def find_edge_by_labels!()
-    result = @edges.find { |edge| edge.label == label }
+  def find_edge_by_labels!(from, to)
+    result = @edges.find { |edge| edge.from == from && edge.to == to || edge.from == to && edge.to == from }
 
     raise EdgeNotFound, "could not find a edge with label=#{label}" if result.nil?
 
@@ -107,6 +99,13 @@ class Math::Discrete::Graph
 
   private
 
+  attr_writer :vertices, :edges, :name
+
+  def initialize(vertices: [].to_set, edges: [].to_set)
+    @vertices = vertices
+    @edges = edges
+  end
+
   def unique_vertex?(vertex)
     find_vertices_by_labels! vertex.label
   rescue VertexNotFound
@@ -114,7 +113,7 @@ class Math::Discrete::Graph
   end
 
   def unique_edge?(edge)
-    find_edge_by_labels! *edge.labels.to_a
+    find_edge_by_labels! edge.from.label, edge.to.label
   rescue EdgeNotFound
     true
   end
