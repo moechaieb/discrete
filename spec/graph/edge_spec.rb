@@ -15,6 +15,11 @@ describe Math::Discrete::Graph::Edge do
       expect(edge.from.adjacent_vertices).to include edge.to
       expect(edge.to.adjacent_vertices).to be_empty
     end
+
+    it 'raises a TypeError when given objects of non-Vertex type as input' do
+      expect { Edge.build_from_vertices 'Not a vertex', second_vertex }.to raise_error Math::Discrete::TypeError
+      expect { Edge.build_from_vertices first_vertex, 'Not a vertex' }.to raise_error Math::Discrete::TypeError
+    end
   end
 
   describe '#labels' do

@@ -6,11 +6,11 @@ class Math::Discrete::Graph::Edge
   end
 
   def labels
-    [from.label, to.label].to_set
+    Set[from.label, to.label]
   end
 
   def to_set
-    [from, to].to_set
+    Set[from, to]
   end
 
   private
@@ -22,6 +22,6 @@ class Math::Discrete::Graph::Edge
     @from = from
     @to = to
 
-    @from.add_adjacent_vertex @to
+    @from.send :add_adjacent_vertex, @to
   end
 end
