@@ -17,7 +17,7 @@ describe Math::Discrete::Graph::Vertex do
     it 'adds the given vertex to the vertex\'s set of adjacent vertices' do
       vertex.add_adjacent_vertex other_vertex
 
-      expect(vertex.adjacent_vertices).to include(other_vertex)
+      expect(vertex.adjacent_vertices).to include other_vertex
     end
   end
 
@@ -25,7 +25,7 @@ describe Math::Discrete::Graph::Vertex do
     let(:graph) { Math::Discrete::Graph.build_from_sets }
 
     it 'raises an error when given an input that is not of type Math::Discrete::Graph' do
-      expect { vertex.set_graph! 'I am not a graph' }.to raise_error(Math::Discrete::TypeError)
+      expect { vertex.set_graph! 'I am not a graph' }.to raise_error Math::Discrete::TypeError
     end
 
     it 'sets the graph attribute to the given graph' do
@@ -52,7 +52,7 @@ describe Math::Discrete::Graph::Vertex do
     end
 
     it 'raises an error when compared to an object of non-Vertex type' do
-      expect { vertex == 'This is not a vertex' }.to raise_error(Math::Discrete::TypeError)
+      expect { vertex == 'This is not a vertex' }.to raise_error Math::Discrete::TypeError
     end
   end
 end

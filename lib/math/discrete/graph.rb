@@ -15,11 +15,11 @@ class Math::Discrete::Graph
     vertices = vertices.map { |label| Vertex.build_from_label label }
     graph.add_vertices! vertices
 
-    edges = edges.map do |from, to|
-      Edge.new(
-        from: find_vertex_by_label!(from),
-        to: find_vertex_by_label!(to)
-      )
+    edges = edges.flat_map do |from, to|
+      [
+        Edge.new(from: find_vertex_by_label!(from), to: find_vertex_by_label!(to)),
+        Edge.new(from: find_vertex_by_label!(to), to: find_vertex_by_label!(from))
+      ]
     end
     graph.add_edges! edges
 
@@ -51,8 +51,6 @@ class Math::Discrete::Graph
     raise Math::Discrete::TypeError, 'edge already exists in graph' unless unique_edge? edge
 
     edge.set_graph! self
-    edge.from.add_adjacent_vertex edge.to
-    edge.to.add_adjacent_vertex edge.from
 
     @edges.add edge
   end
