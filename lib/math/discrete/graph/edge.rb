@@ -1,15 +1,8 @@
 class Math::Discrete::Graph::Edge
   attr_reader :from, :to
-  attr_accessor :graph
 
   def self.build_from_vertices(from , to)
     new from: from, to: to
-  end
-
-  def set_graph!(graph)
-    raise Math::Discrete::TypeError, 'graph must be of type Math::Discrete::Graph' unless graph.is_a? Graph
-
-    @graph = graph
   end
 
   def labels
@@ -28,7 +21,6 @@ class Math::Discrete::Graph::Edge
 
     @from = from
     @to = to
-    @graph = nil
 
     @from.add_adjacent_vertex @to
   end

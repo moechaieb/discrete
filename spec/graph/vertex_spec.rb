@@ -2,11 +2,11 @@ require 'spec_helper'
 
 describe Math::Discrete::Graph::Vertex do
   let(:vertex) { Math::Discrete::Graph::Vertex.build_from_label 'test' }
+
   describe '::build_from_label' do
-    it 'creates a new vertex with the given label, no graph and no adjacent vertices' do
+    it 'creates a new vertex with the given label and no adjacent vertices' do
       expect(vertex).to be_a Math::Discrete::Graph::Vertex
       expect(vertex.label).to eq 'test'
-      expect(vertex.graph).to be_nil
       expect(vertex.adjacent_vertices).to be_empty
     end
   end
@@ -21,17 +21,14 @@ describe Math::Discrete::Graph::Vertex do
     end
   end
 
-  describe '#set_graph!' do
-    let(:graph) { Math::Discrete::Graph.build_from_sets }
+  describe '#remove_adjacent_vertex' do
+    let(:other_vertex) { Math::Discrete::Graph::Vertex.build_from_label 'other' }
 
-    it 'raises an error when given an input that is not of type Math::Discrete::Graph' do
-      expect { vertex.set_graph! 'I am not a graph' }.to raise_error Math::Discrete::TypeError
-    end
+    it 'removes the given vertex from the vertex\'s set of adjacent vertices' do
+      vertex.add_adjacent_vertex other_vertex
+      vertex.remove_adjacent_vertex other_vertex
 
-    it 'sets the graph attribute to the given graph' do
-      expect { vertex.set_graph! graph }.not_to raise_error
-      expect(vertex.graph).to eq graph
-      expect(vertex.graph).to be_a Math::Discrete::Graph
+      expect(vertex.adjacent_vertices).not_to include other_vertex
     end
   end
 

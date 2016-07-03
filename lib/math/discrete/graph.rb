@@ -6,31 +6,42 @@ class Math::Discrete::Graph
 
   attr_reader :vertices, :edges, :name
 
+  def self.build
+    new
+  end
+
   def self.build_from_sets(vertices: [].to_set, edges: [].to_set)
-    raise Math::Discrete::TypeError, 'vertices must be of type Set' unless vertices.is_a? Set
-    raise Math::Discrete::TypeError, 'edges must be of type Set' unless edges.is_a? Set
+    raise Math::Discrete::TypeError, 'vertices must be of type Set' unless vertex_labels.is_a? Set
+    raise Math::Discrete::TypeError, 'edges must be of type Set' unless edge_labels.is_a? Set
 
     graph = new
 
-    vertices = vertices.map { |label| Vertex.build_from_label label }
     graph.add_vertices! vertices
-
-    edges = edges.flat_map do |from, to|
-      [
-        Edge.new(from: find_vertex_by_label!(from), to: find_vertex_by_label!(to)),
-        Edge.new(from: find_vertex_by_label!(to), to: find_vertex_by_label!(from))
-      ]
-    end
     graph.add_edges! edges
 
     graph
   end
 
+  def self.build_from_labels(vertex_labels: [].to_set, edge_labels: [].to_set)
+    raise Math::Discrete::TypeError, 'vertices must be of type Set' unless vertex_labels.is_a? Set
+    raise Math::Discrete::TypeError, 'edges must be of type Set' unless edge_labels.is_a? Set
+
+    vertices = vertex_labels.map { |label| Vertex.build_from_label label }
+
+    edges = edge_labels.flat_map do |from, to|
+      [
+        Edge.new(from: find_vertex_by_label!(from), to: find_vertex_by_label!(to)),
+        Edge.new(from: find_vertex_by_label!(to), to: find_vertex_by_label!(from))
+      ]
+    end
+
+    build_from_sets vertices: vertices, edges: edges
+  end
+
   def add_vertex!(vertex)
     raise Math::Discrete::TypeError, 'vertex must be of the type Math::Discrete::Graph::Vertex' unless vertex.is_a? Vertex
-    raise Math::Discrete::TypeError, 'vertex labels in a graph must be unique' unless unique_vertex? vertex
+    raise Math::Discrete::TypeError, 'vertex labels must be unique' unless unique_vertex? vertex
 
-    vertex.set_graph! self
     @vertices.add vertex
   end
 
@@ -49,8 +60,6 @@ class Math::Discrete::Graph
   def add_edge!(edge)
     raise Math::Discrete::TypeError, 'edge must be of the type Math::Discrete::Graph::Edge' unless edge.is_a? Edge
     raise Math::Discrete::TypeError, 'edge already exists in graph' unless unique_edge? edge
-
-    edge.set_graph! self
 
     @edges.add edge
   end

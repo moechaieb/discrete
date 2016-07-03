@@ -6,28 +6,14 @@ describe Math::Discrete::Graph::Edge do
   let(:edge) { Math::Discrete::Graph::Edge.build_from_vertices first_vertex, second_vertex }
 
   describe '::build_from_vertices' do
-    it 'creates a new edge between the two given vertices, and has no graph' do
-      expect(edge.graph).to be_nil
+    it 'creates a new edge between the two given vertices' do
       expect(edge.from).to be first_vertex
       expect(edge.to).to be second_vertex
     end
 
     it 'connects the vertices and updates their set of adjacent vertices' do
       expect(edge.from.adjacent_vertices).to include edge.to
-    end
-  end
-
-  describe '#set_graph!' do
-    let(:graph) { Math::Discrete::Graph.build_from_sets }
-
-    it 'raises an error when given an input that is not of type Math::Discrete::Graph' do
-      expect { edge.set_graph! 'I am not a graph' }.to raise_error(Math::Discrete::TypeError)
-    end
-
-    it 'sets the graph attribute to the given graph' do
-      expect { edge.set_graph! graph }.not_to raise_error
-      expect(edge.graph).to eq graph
-      expect(edge.graph).to be_a Math::Discrete::Graph
+      expect(edge.to.adjacent_vertices).to be_empty
     end
   end
 

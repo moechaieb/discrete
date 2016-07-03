@@ -1,6 +1,6 @@
 class Math::Discrete::Graph::Vertex
   attr_accessor :label
-  attr_reader :graph, :adjacent_vertices
+  attr_reader :adjacent_vertices
 
   def self.build_from_label(label)
     new label: label
@@ -10,10 +10,8 @@ class Math::Discrete::Graph::Vertex
     @adjacent_vertices.add vertex
   end
 
-  def set_graph!(graph)
-    raise Math::Discrete::TypeError, 'graph must be of type Math::Discrete::Graph' unless graph.is_a? Graph
-
-    @graph = graph
+  def remove_adjacent_vertex(vertex)
+    @adjacent_vertices.delete vertex
   end
 
   def ==(other_vertex)
@@ -25,7 +23,6 @@ class Math::Discrete::Graph::Vertex
   private
 
   def initialize(label: nil)
-    @graph = nil
     @label = label
     @adjacent_vertices = [].to_set
   end
