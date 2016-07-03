@@ -1,10 +1,11 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-require 'discrete'
 require 'simplecov'
-
 SimpleCov.start
 
-require 'codecov'
+if ENV['CI'] == 'true'
+  require 'codecov'
+  SimpleCov.formatter = SimpleCov::Formatter::Codecov
+end
 
-SimpleCov.formatter = SimpleCov::Formatter::Codecov
+require 'discrete'
