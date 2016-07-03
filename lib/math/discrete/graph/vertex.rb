@@ -6,23 +6,27 @@ class Math::Discrete::Graph::Vertex
     new label: label
   end
 
-  def initialize(label: nil)
-    @graph = nil
-    @label = label
-    @adjacent_vertices = [].to_set
-  end
-
   def add_adjacent_vertex(vertex)
     @adjacent_vertices.add vertex
   end
 
   def set_graph!(graph)
-    raise Math::Discrete::TypeError, 'first must be of type Math::Discrete::Graph' unless graph.is_a? Graph
+    raise Math::Discrete::TypeError, 'graph must be of type Math::Discrete::Graph' unless graph.is_a? Graph
 
     @graph = graph
   end
 
   def ==(other_vertex)
+    raise Math::Discrete::TypeError, 'other_vertex must be of type Math::Discrete::Vertex' unless other_vertex.is_a? Vertex
+
     label == other_vertex.label
+  end
+
+  private
+
+  def initialize(label: nil)
+    @graph = nil
+    @label = label
+    @adjacent_vertices = [].to_set
   end
 end
