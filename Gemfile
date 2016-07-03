@@ -5,3 +5,4 @@ gemspec
 
 gem 'algorithms'
 gem 'pry'
+gem 'codecov', require: false, group: :test
