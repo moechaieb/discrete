@@ -1,4 +1,4 @@
-# Math::Discrete
+# Math::Discrete [![CircleCI](https://circleci.com/gh/mac-adam-chaieb/discrete.svg?style=shield)](https://circleci.com/gh/mac-adam-chaieb/discrete)
 
 A library and DSL for discrete mathematical structures and algorithms
 
