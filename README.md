@@ -1,5 +1,7 @@
-# Math::Discrete [![CircleCI](https://circleci.com/gh/mac-adam-chaieb/discrete.svg?style=shield)](https://circleci.com/gh/mac-adam-chaieb/discrete) [![codecov](https://codecov.io/gh/mac-adam-chaieb/discrete/branch/master/graph/badge.svg)](https://codecov.io/gh/mac-adam-chaieb/discrete)
-
+# Math::Discrete
+[![CircleCI](https://circleci.com/gh/mac-adam-chaieb/discrete.svg?style=shield)](https://circleci.com/gh/mac-adam-chaieb/discrete)
+[![codecov](https://codecov.io/gh/mac-adam-chaieb/discrete/branch/master/graph/badge.svg)](https://codecov.io/gh/mac-adam-chaieb/discrete)
+[![License](http://img.shields.io/badge/license-MIT-green.svg)](#license)
 
 A library and DSL for discrete mathematical structures and algorithms
 
