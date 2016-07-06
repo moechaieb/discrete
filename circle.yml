@@ -1,3 +1,5 @@
 machine:
   environment:
     CODECOV_TOKEN: 286450e3-b48b-45e4-bba1-b0a18e529316
+  ruby:
+    version: 2.3.1

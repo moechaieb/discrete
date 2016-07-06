@@ -4,116 +4,156 @@ class Math::Discrete::Graph
   class EdgeNotFound < StandardError; end
   class EdgeNotUnique < StandardError; end
 
-  attr_reader :vertices, :edges, :name
+  attr_reader :vertex_set, :edge_set, :name
+  alias_method :node_set, :vertex_set
 
-  def self.build_from_sets(vertices: [].to_set, edges: [].to_set)
-    raise Math::Discrete::TypeError, 'vertices must be of type Set' unless vertices.is_a? Set
-    raise Math::Discrete::TypeError, 'edges must be of type Set' unless edges.is_a? Set
+  def self.build
+    new
+  end
+
+  def self.build_from_sets(vertex_set: Set[], edge_set: Set[])
+    raise Math::Discrete::TypeError, 'vertex_set must be of type Set' unless vertex_set.is_a? Set
+    raise Math::Discrete::TypeError, 'edge_set must be of type Set' unless edge_set.is_a? Set
 
     graph = new
 
-    vertices = vertices.map { |label| Vertex.build_from_label label }
-    graph.add_vertices! vertices
-
-    edges = edges.map do |from, to|
-      Edge.new(
-        from: find_vertex_by_label!(from),
-        to: find_vertex_by_label!(to)
-      )
-    end
-    graph.add_edges! edges
+    graph.add_vertices! vertex_set
+    graph.add_edges! edge_set
 
     graph
   end
 
+  def self.build_from_labels(vertex_labels: Set[], edge_labels: Set[])
+    raise Math::Discrete::TypeError, 'vertex_labels must be of type Set' unless vertex_labels.is_a? Set
+    raise Math::Discrete::TypeError, 'edge_labels must be of type Set' unless edge_labels.is_a? Set
+
+    vertices = vertex_labels.map { |label| Vertex.build_from_label label }
+
+    edges = edge_labels.map do |label_set|
+      from = vertices.find { |vertex| vertex.label == label_set.first }
+      to = vertices.find { |vertex| vertex.label == label_set.to_a.last }
+
+      raise VertexNotFound, "could not find a vertex with label=#{label_set.first}" if from.nil?
+      raise VertexNotFound, "could not find a vertex with label=#{label_set.to_a.last}" if to.nil?
+
+      Edge.new(from: from, to: to)
+    end
+
+    build_from_sets vertex_set: Set[*vertices], edge_set: Set[*edges]
+  end
+
   def add_vertex!(vertex)
     raise Math::Discrete::TypeError, 'vertex must be of the type Math::Discrete::Graph::Vertex' unless vertex.is_a? Vertex
-    raise Math::Discrete::TypeError, 'vertex labels in a graph must be unique' unless unique_vertex? vertex
+    raise VertexNotUnique, 'vertex labels must be unique' unless unique_vertex? vertex
 
-    vertex.set_graph! self
-    @vertices.add vertex
+    @vertex_set.add vertex
   end
-
-  def add_node!(node)
-    add_vertex! node
-  end
+  alias_method :add_node!, :add_vertex!
 
   def add_vertices!(vertices)
     vertices.each { |vertex| add_vertex! vertex }
   end
-
-  def add_nodes!(nodes)
-    add_vertices!(nodes)
-  end
+  alias_method :add_nodes!, :add_vertices!
 
   def add_edge!(edge)
     raise Math::Discrete::TypeError, 'edge must be of the type Math::Discrete::Graph::Edge' unless edge.is_a? Edge
-    raise Math::Discrete::TypeError, 'edge already exists in graph' unless unique_edge? edge
+    raise EdgeNotUnique, 'edge already exists in graph' unless unique_edge? edge
 
-    edge.set_graph! self
-    edge.from.add_adjacent_vertex edge.to
-    edge.to.add_adjacent_vertex edge.from
-
-    @edges.add edge
+    @edge_set.add edge
   end
 
   def add_edges!(edges)
     edges.each { |edge| add_edge! edge }
   end
 
+  def remove_vertex!(vertex)
+    raise Math::Discrete::TypeError, 'vertex must be of the type Math::Discrete::Graph::Vertex' unless vertex.is_a? Vertex
+
+    find_vertex_by_label! vertex.label
+
+    @edge_set.delete_if { |edge| edge.labels.include? vertex.label }
+    @vertex_set.delete vertex
+  end
+  alias_method :remove_node!, :remove_vertex!
+
+  def remove_vertices!(vertices)
+    vertices.each { |vertex| remove_vertex! vertex }
+  end
+  alias_method :remove_nodes!, :remove_vertices!
+
+  def remove_edge!(edge)
+    raise Math::Discrete::TypeError, 'edge must be of the type Math::Discrete::Graph::Edge' unless edge.is_a? Edge
+
+    find_edge_by_labels! *edge.labels
+
+    @edge_set.delete edge
+  end
+
+  def remove_edges!(edges)
+    edges.each { |edge| remove_edge! edge }
+  end
+
   def find_vertex_by_label!(label)
-    result = @vertices.find { |vertex| vertex.label == label }
+    result = @vertex_set.find { |vertex| vertex.label == label }
 
     raise VertexNotFound, "could not find a vertex with label=#{label}" if result.nil?
 
     result
   end
+  alias_method :find_node_by_label!, :find_vertex_by_label!
 
-  def find_vertices_by_labels!(labels)
-    result = @vertices.find_all { |vertex| labels.include? vertex.label }
-
-    raise VertexNotFound, "could not find a vertices with labels #{labels}" if result.nil?
-
-    result
+  def find_vertices_by_labels!(*labels)
+    Set[*[*labels].map { |label| find_vertex_by_label! label }]
   end
+  alias_method :find_nodes_by_labels!, :find_vertices_by_labels!
 
-  def find_edge_by_labels!(from, to)
-    result = @edges.find { |edge| edge.from == from && edge.to == to || edge.from == to && edge.to == from }
+  def find_edge_by_labels!(from_label, to_label)
+    begin
+      result = @edge_set.find do |edge|
+        from = find_vertex_by_label! from_label
+        to = find_vertex_by_label! to_label
 
-    raise EdgeNotFound, "could not find a edge with label=#{label}" if result.nil?
+        edge.from == from && edge.to == to
+      end
+    rescue VertexNotFound
+      raise EdgeNotFound, "could not find a edge with labels=(#{from_label},#{to_label})"
+    end
+
+    raise EdgeNotFound, "could not find a edge with labels=(#{from_label},#{to_label})" if result.nil?
 
     result
   end
 
   def vertex_labels
-    @vertices.map &:label
+    Set[*@vertex_set.map(&:label)]
   end
+  alias_method :node_labels, :vertex_labels
 
-  def vertex_ids
-    @vertices.map &:id
-  end
-
-  def nodes
-    vertices
+  def edge_labels
+    Set[*@edge_set.map(&:labels)]
   end
 
   private
 
   attr_writer :vertices, :edges, :name
 
-  def initialize(vertices: [].to_set, edges: [].to_set)
-    @vertices = vertices
-    @edges = edges
+  def initialize(vertex_set: Set[], edge_set: Set[])
+    @vertex_set = vertex_set
+    @edge_set = edge_set
   end
 
   def unique_vertex?(vertex)
-    find_vertices_by_labels! vertex.label
+    find_vertex_by_label! vertex.label
+
+    false
   rescue VertexNotFound
     true
   end
 
   def unique_edge?(edge)
-    find_edge_by_labels! edge.from.label, edge.to.label
+    find_edge_by_labels! *edge.labels
+
+    false
   rescue EdgeNotFound
     true
   end
