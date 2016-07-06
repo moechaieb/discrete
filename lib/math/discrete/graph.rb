@@ -3,8 +3,9 @@ class Math::Discrete::Graph
   class VertexNotUnique < StandardError; end
   class EdgeNotFound < StandardError; end
   class EdgeNotUnique < StandardError; end
+  class PropertyNotFound < StandardError; end
 
-  attr_reader :vertex_set, :edge_set, :name
+  attr_reader :vertex_set, :edge_set, :name, :property_set
   alias_method :node_set, :vertex_set
 
   def self.build
@@ -36,7 +37,7 @@ class Math::Discrete::Graph
       raise VertexNotFound, "could not find a vertex with label=#{label_set.first}" if from.nil?
       raise VertexNotFound, "could not find a vertex with label=#{label_set.to_a.last}" if to.nil?
 
-      Edge.new(from: from, to: to)
+      Edge.new from: from, to: to
     end
 
     build_from_sets vertex_set: Set[*vertices], edge_set: Set[*edges]
@@ -45,6 +46,8 @@ class Math::Discrete::Graph
   def add_vertex!(vertex)
     raise Math::Discrete::TypeError, 'vertex must be of the type Math::Discrete::Graph::Vertex' unless vertex.is_a? Vertex
     raise VertexNotUnique, 'vertex labels must be unique' unless unique_vertex? vertex
+
+    clear_property_map!
 
     @vertex_set.add vertex
   end
@@ -59,6 +62,8 @@ class Math::Discrete::Graph
     raise Math::Discrete::TypeError, 'edge must be of the type Math::Discrete::Graph::Edge' unless edge.is_a? Edge
     raise EdgeNotUnique, 'edge already exists in graph' unless unique_edge? edge
 
+    clear_property_map!
+
     @edge_set.add edge
   end
 
@@ -70,6 +75,7 @@ class Math::Discrete::Graph
     raise Math::Discrete::TypeError, 'vertex must be of the type Math::Discrete::Graph::Vertex' unless vertex.is_a? Vertex
 
     find_vertex_by_label! vertex.label
+    clear_property_map!
 
     @edge_set.delete_if { |edge| edge.labels.include? vertex.label }
     @vertex_set.delete vertex
@@ -85,6 +91,7 @@ class Math::Discrete::Graph
     raise Math::Discrete::TypeError, 'edge must be of the type Math::Discrete::Graph::Edge' unless edge.is_a? Edge
 
     find_edge_by_labels! *edge.labels
+    clear_property_map!
 
     @edge_set.delete edge
   end
@@ -124,6 +131,14 @@ class Math::Discrete::Graph
     result
   end
 
+  def find_property_by_name!(name)
+    result = @property_set.find { |property| property.name == name.to_sym }
+
+    raise PropertyNotFound, "could not find property with name=#{name}" if result.nil?
+
+    result
+  end
+
   def vertex_labels
     Set[*@vertex_set.map(&:label)]
   end
@@ -133,13 +148,19 @@ class Math::Discrete::Graph
     Set[*@edge_set.map(&:labels)]
   end
 
+  def satisfies_property?(name)
+    return @property_map[name] unless @property_map[name].nil?
+
+    find_property_by_name!(name).satisfied? self
+  end
+
   private
 
-  attr_writer :vertices, :edges, :name
-
-  def initialize(vertex_set: Set[], edge_set: Set[])
+  def initialize(vertex_set: Set[], edge_set: Set[], property_set: Properties::all)
     @vertex_set = vertex_set
     @edge_set = edge_set
+    @property_set = property_set
+    @property_map = {}
   end
 
   def unique_vertex?(vertex)
@@ -156,5 +177,15 @@ class Math::Discrete::Graph
     false
   rescue EdgeNotFound
     true
+  end
+
+  def build_property_map!
+    @property_map = @property_set.map(&:name).reduce do |map, property_name|
+      map.merge property_name => satisfies_property?(property_name)
+    end
+  end
+
+  def clear_property_map!
+    @property_map = {}
   end
 end
