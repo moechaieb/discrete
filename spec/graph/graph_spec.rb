@@ -1,48 +1,91 @@
 require 'spec_helper'
 
 describe Math::Discrete::Graph do
-  let(:graph) { Math::Discrete::Graph.build }
+  let(:directed_graph) { Math::Discrete::Graph.build }
+  let(:undirected_graph) { Math::Discrete::Graph.build directed: false }
   let(:labels) { Set['A', 'B'] }
 
-  describe '::build' do
-    it 'creates agraph with an empty vertex set and edge set' do
-      expect(graph.vertex_set).to be_empty
-      expect(graph.edge_set).to be_empty
+  describe '::build, ::build directed: true' do
+    it 'creates a directed graph with an empty vertex set and edge set' do
+      expect(directed_graph.vertex_set).to be_empty
+      expect(directed_graph.edge_set).to be_empty
+      expect(directed_graph).to be_directed
+    end
+  end
+
+  describe '::build directed: false' do
+    it 'creates an undirected graph with an empty vertex set and edge set' do
+      expect(undirected_graph.vertex_set).to be_empty
+      expect(undirected_graph.edge_set).to be_empty
+      expect(undirected_graph).not_to be_directed
     end
   end
 
   describe '::build_from_sets' do
     let(:vertex_set) { Math::Discrete::Graph::Vertex.build_from_labels 'A', 'B', 'C' }
-    let(:edge_set) do
-      [
-        Edge.build_from_vertices(vertex_set.to_a[0], vertex_set.to_a[1]),
-        Edge.build_from_vertices(vertex_set.to_a[1], vertex_set.to_a[0]),
-        Edge.build_from_vertices(vertex_set.to_a[1], vertex_set.to_a[2]),
-        Edge.build_from_vertices(vertex_set.to_a[2], vertex_set.to_a[1])
-      ].to_set
+    let(:directed_edge_set) do
+      Set[
+        Edge::Directed.build(from: vertex_set.entries[0], to: vertex_set.entries[1]),
+        Edge::Directed.build(from: vertex_set.entries[1], to: vertex_set.entries[0]),
+        Edge::Directed.build(from: vertex_set.entries[1], to: vertex_set.entries[2]),
+        Edge::Directed.build(from: vertex_set.entries[2], to: vertex_set.entries[1])
+      ]
     end
-    let(:graph) { Math::Discrete::Graph.build_from_sets vertex_set: vertex_set, edge_set: edge_set }
+    let(:undirected_edge_set) do
+      Set[
+        Edge::Undirected.build_between(vertex_set.entries[0], vertex_set.entries[1]),
+        Edge::Undirected.build_between(vertex_set.entries[1], vertex_set.entries[2]),
+      ]
+    end
+    let(:directed_graph) { Math::Discrete::Graph.build_from_sets vertex_set: vertex_set, edge_set: directed_edge_set }
+    let(:undirected_graph) { Math::Discrete::Graph.build_from_sets vertex_set: vertex_set, edge_set: undirected_edge_set }
 
     it 'creates a graph from the given sets of vertices and edges' do
-      expect(graph).to be_a Math::Discrete::Graph
-      expect(graph.vertex_set).to eq vertex_set
-      expect(graph.edge_set).to eq edge_set
+      expect(directed_graph).to be_a Math::Discrete::Graph
+      expect(directed_graph).to be_directed
+      expect(directed_graph.vertex_set).to eq vertex_set
+      expect(directed_graph.edge_set).to eq directed_edge_set
+
+      expect(undirected_graph).to be_a Math::Discrete::Graph
+      expect(undirected_graph).not_to be_directed
+      expect(undirected_graph.vertex_set).to eq vertex_set
+      expect(undirected_graph.edge_set).to eq undirected_edge_set
+    end
+
+    it 'creates a directed or undirected graph based on the edge set' do
+      expect(directed_edge_set).to all be_directed
+      expect(directed_graph).to be_directed
+
+      expect(undirected_edge_set).to all(satisfy { |edge| !edge.directed? })
+      expect(undirected_graph).not_to be_directed
     end
   end
 
   describe '::build_from_labels' do
     let(:vertex_labels) { Set['A', 'B', 'C', 'D'] }
     let(:edge_labels) { Set[*[%w(A D), %w(B D), %w(A C)].map(&:to_set)] }
-    let(:graph) { Math::Discrete::Graph.build_from_labels vertex_labels: vertex_labels, edge_labels: edge_labels }
+    let(:directed_graph) { Math::Discrete::Graph.build_from_labels vertex_labels: vertex_labels, edge_labels: edge_labels }
+    let(:undirected_graph) { Math::Discrete::Graph.build_from_labels directed: false, vertex_labels: vertex_labels, edge_labels: edge_labels }
 
-    it 'creates a graph from the given sets of labels' do
-      expect(graph).to be_a Math::Discrete::Graph
-      expect(graph.vertex_labels).to eq vertex_labels
-      expect(graph.edge_labels).to eq edge_labels
+    it 'creates a directed graph from the given sets of labels by default' do
+      expect(directed_graph).to be_a Math::Discrete::Graph
+      expect(directed_graph).to be_directed
+      expect(directed_graph.vertex_labels).to eq vertex_labels
+      expect(directed_graph.edge_labels).to eq edge_labels
+      expect(directed_graph.edge_set).to all be_directed
+    end
+
+    it 'creates an undirected graph from the given sets of labels when passed directed: false' do
+      expect(undirected_graph).to be_a Math::Discrete::Graph
+      expect(undirected_graph).not_to be_directed
+      expect(undirected_graph.vertex_labels).to eq vertex_labels
+      expect(undirected_graph.edge_set).to all( satisfy { |edge| !edge.directed? })
+      expect(undirected_graph.edge_labels).to eq edge_labels
     end
   end
 
   describe '#add_vertex!, #add_node!' do
+    let(:graph) { Math::Discrete::Graph.build }
     let(:vertex) { Math::Discrete::Graph::Vertex.build_from_label 'A' }
 
     it 'adds the vertex to the vertex set' do
@@ -62,6 +105,7 @@ describe Math::Discrete::Graph do
   end
 
   describe '#add_vertices!, #add_nodes!' do
+    let(:graph) { Math::Discrete::Graph.build }
     let(:vertices) { Math::Discrete::Graph::Vertex.build_from_labels *labels }
 
     it 'adds the vertices to the vertex set' do
@@ -82,50 +126,70 @@ describe Math::Discrete::Graph do
 
   describe '#add_edge!' do
     let(:vertices) { Math::Discrete::Graph::Vertex.build_from_labels *labels }
-    let(:edge) { Math::Discrete::Graph::Edge.build_from_vertices *vertices }
-    let(:graph) { Math::Discrete::Graph.build_from_sets vertex_set: vertices }
+    let(:directed_graph) { Math::Discrete::Graph.build_from_sets vertex_set: vertices }
+    let(:undirected_graph) { Math::Discrete::Graph.build directed: false }
+    let(:directed_edge) { Math::Discrete::Graph::Edge::Directed.build from: vertices.entries[0], to: vertices.entries[1] }
+    let(:undirected_edge) { Math::Discrete::Graph::Edge::Undirected.build_between *vertices}
 
     it 'adds the edge to the edge set' do
-      expect { graph.add_edge! edge }.to change(graph.edge_set, :count).by 1
-      expect(graph.edge_set).to include edge
+      expect { directed_graph.add_edge! directed_edge }.to change(directed_graph.edge_set, :count).by 1
+      expect(directed_graph.edge_set).to include directed_edge
     end
 
     it 'raises a TypeError if the input is an object of a non-Edge type' do
-      expect { graph.add_edge! 'This is not an edge' }.to raise_error Math::Discrete::TypeError
+      expect { directed_graph.add_edge! 'This is not an edge' }.to raise_error Math::Discrete::TypeError
     end
 
     it 'raises a EdgeNotUnique if the edge is already part of the edge set' do
-      graph.add_edge! edge
+      directed_graph.add_edge! directed_edge
 
-      expect { graph.add_edge! edge }.to raise_error Math::Discrete::Graph::EdgeNotUnique
+      expect { directed_graph.add_edge! directed_edge }.to raise_error Math::Discrete::Graph::EdgeNotUnique
+    end
+
+    it 'raises a BadEdgeType if the edge is directed and the graph is undirected' do
+      expect { undirected_graph.add_edge! directed_edge }.to raise_error Math::Discrete::Graph::BadEdgeType
+    end
+
+    it 'raises a BadEdgeType if the edge is undirected and the graph is directed' do
+      expect { directed_graph.add_edge! undirected_edge }.to raise_error Math::Discrete::Graph::BadEdgeType
     end
   end
 
   describe '#add_edges!' do
     let(:vertices) { Math::Discrete::Graph::Vertex.build_from_labels *labels }
-    let(:edges) { [Math::Discrete::Graph::Edge.build_from_vertices(*vertices)] }
-    let(:graph) { Math::Discrete::Graph.build_from_sets vertex_set: vertices }
+    let(:directed_graph) { Math::Discrete::Graph.build_from_sets vertex_set: vertices }
+    let(:undirected_graph) { Math::Discrete::Graph.build directed: false }
+    let(:directed_edges) { Set[Math::Discrete::Graph::Edge::Directed.build from: vertices.entries[0], to: vertices.entries[1]] }
+    let(:undirected_edges) { Set[Math::Discrete::Graph::Edge::Undirected.build_between *vertices] }
 
     it 'adds the edges to the edge set' do
-      expect { graph.add_edges! edges }.to change(graph.edge_set, :count).by 1
-      expect(graph.edge_set).to include *edges
+      expect { directed_graph.add_edges! directed_edges }.to change(directed_graph.edge_set, :count).by 1
+      expect(directed_graph.edge_set).to include *directed_edges
     end
 
     it 'raises a TypeError if the input includes an object of a non-Edge type' do
-      expect { graph.add_edges!(edges << 'This is not an edge') }.to raise_error Math::Discrete::TypeError
+      expect { directed_graph.add_edges!(directed_edges << 'This is not an edge') }.to raise_error Math::Discrete::TypeError
     end
 
     it 'raises a EdgeNotUnique if the input includes an edge that is already part of the edge set' do
-      graph.add_edge! edges.first
+      directed_graph.add_edge! directed_edges.first
 
-      expect { graph.add_edges! edges }.to raise_error Math::Discrete::Graph::EdgeNotUnique
+      expect { directed_graph.add_edges! directed_edges }.to raise_error Math::Discrete::Graph::EdgeNotUnique
+    end
+
+    it 'raises a BadEdgeType if the edge is directed and the graph is undirected' do
+      expect { undirected_graph.add_edges! directed_edges }.to raise_error Math::Discrete::Graph::BadEdgeType
+    end
+
+    it 'raises a BadEdgeType if the edge is undirected and the graph is directed' do
+      expect { directed_graph.add_edges! undirected_edges }.to raise_error Math::Discrete::Graph::BadEdgeType
     end
   end
 
   describe '#remove_vertex!, #remove_node!' do
     let(:vertices) { Math::Discrete::Graph::Vertex.build_from_labels *labels }
     let(:vertex) { vertices.first }
-    let(:edge) { Math::Discrete::Graph::Edge.build_from_vertices *vertices }
+    let(:edge) { Math::Discrete::Graph::Edge::Undirected.build_between *vertices }
     let(:edges) { Set[edge] }
     let(:graph) { Math::Discrete::Graph.build_from_sets vertex_set: vertices, edge_set: edges }
 
@@ -153,7 +217,7 @@ describe Math::Discrete::Graph do
   describe '#remove_vertices!, #remove_nodes!' do
     let(:vertices) { Math::Discrete::Graph::Vertex.build_from_labels *labels }
     let(:vertex) { vertices.first }
-    let(:edge) { Math::Discrete::Graph::Edge.build_from_vertices *vertices }
+    let(:edge) { Math::Discrete::Graph::Edge::Undirected.build_between *vertices }
     let(:edges) { Set[edge] }
     let(:graph) { Math::Discrete::Graph.build_from_sets vertex_set: vertices, edge_set: edges }
 
@@ -180,7 +244,7 @@ describe Math::Discrete::Graph do
 
   describe '#remove_edge' do
     let(:vertices) { Math::Discrete::Graph::Vertex.build_from_labels *labels }
-    let(:edge) { Math::Discrete::Graph::Edge.build_from_vertices *vertices }
+    let(:edge) { Math::Discrete::Graph::Edge::Directed.build from: vertices.entries[0], to: vertices.entries[1] }
     let(:edges) { Set[edge] }
     let(:graph) { Math::Discrete::Graph.build_from_sets vertex_set: vertices, edge_set: edges }
 
@@ -194,7 +258,7 @@ describe Math::Discrete::Graph do
     end
 
     it 'raises an EdgeNotFound if the input is an edge that is not part of the edge set' do
-      foreign_edge = Math::Discrete::Graph::Edge.build_from_vertices *vertices.to_a.reverse
+      foreign_edge = Math::Discrete::Graph::Edge::Undirected.build_between *vertices
 
       expect { graph.remove_edge! foreign_edge }.to raise_error Math::Discrete::Graph::EdgeNotFound
     end
@@ -202,7 +266,7 @@ describe Math::Discrete::Graph do
 
   describe '#remove_edges' do
     let(:vertices) { Math::Discrete::Graph::Vertex.build_from_labels *labels }
-    let(:edge) { Math::Discrete::Graph::Edge.build_from_vertices *vertices }
+    let(:edge) { Math::Discrete::Graph::Edge::Directed.build from: vertices.entries[0], to: vertices.entries[1] }
     let(:edges) { Set[edge] }
     let(:graph) { Math::Discrete::Graph.build_from_sets vertex_set: vertices, edge_set: edges }
 
@@ -212,13 +276,13 @@ describe Math::Discrete::Graph do
     end
 
     it 'raises a TypeError if the input includes an an object of non-Edge type' do
-      expect { graph.remove_edges! %w(This is not a vertex) }.to raise_error Math::Discrete::TypeError
+      expect { graph.remove_edges! %w(This is not an edge) }.to raise_error Math::Discrete::TypeError
     end
 
     it 'raises an EdgeNotFound if the input includes an edge that is not part of the edge set' do
-      foreign_edge = Math::Discrete::Graph::Edge.build_from_vertices *vertices.entries.reverse
+      foreign_edge = Math::Discrete::Graph::Edge::Undirected.build_between *vertices
 
-      expect { graph.remove_edges! edges.add(foreign_edge) }.to raise_error Math::Discrete::Graph::EdgeNotFound
+      expect { graph.remove_edges! [foreign_edge] }.to raise_error Math::Discrete::Graph::EdgeNotFound
     end
   end
 
@@ -256,18 +320,30 @@ describe Math::Discrete::Graph do
 
   describe '#find_edge_by_labels!' do
     let(:vertices) { Math::Discrete::Graph::Vertex.build_from_labels *labels }
-    let(:edge) { Math::Discrete::Graph::Edge.build_from_vertices *vertices }
-    let(:edges) { Set[edge] }
-    let(:graph) { Math::Discrete::Graph.build_from_sets vertex_set: vertices, edge_set: edges }
-    let(:result) { graph.find_edge_by_labels! *labels }
+    let(:directed_edge) { Math::Discrete::Graph::Edge::Directed.build from: vertices.entries[0], to: vertices.entries[1] }
+    let(:directed_edges) { Set[directed_edge] }
+    let(:undirected_edge) { Math::Discrete::Graph::Edge::Undirected.build_between *vertices }
+    let(:undirected_edges) { Set[undirected_edge] }
+    let(:directed_graph) { Math::Discrete::Graph.build_from_sets vertex_set: vertices, edge_set: directed_edges }
+    let(:undirected_graph) { Math::Discrete::Graph.build_from_sets vertex_set: vertices, edge_set: undirected_edges }
+    let(:directed_result) { directed_graph.find_edge_by_labels! *labels }
+    let(:undirected_result) { undirected_graph.find_edge_by_labels! *labels.entries.reverse }
 
-    it 'returns the edge with the given labels in the edge set' do
-      expect(result).to be_a Math::Discrete::Graph::Edge
-      expect(result.labels).to contain_exactly *labels
+    it 'returns the directed edge with the given labels in order in the edge set' do
+      expect(directed_result).to be_a Math::Discrete::Graph::Edge
+      expect(directed_result).to be_directed
+      expect(directed_result.labels).to contain_exactly *labels
+    end
+
+    it 'returns the undirected edge with the given labels regardless of order in the edge set' do
+      expect(undirected_edge).to be_a Math::Discrete::Graph::Edge
+      expect(undirected_edge).not_to be_directed
+      expect(undirected_result.labels).to contain_exactly *labels
     end
 
     it 'raises EdgeNotFound if the edge set does not include an edge with the given labels' do
-      expect { graph.find_edge_by_labels! 'X', 'Y' }.to raise_error Math::Discrete::Graph::EdgeNotFound
+      expect { directed_graph.find_edge_by_labels! 'X', 'Y' }.to raise_error Math::Discrete::Graph::EdgeNotFound
+      expect { undirected_graph.find_edge_by_labels! 'X', 'Y' }.to raise_error Math::Discrete::Graph::EdgeNotFound
     end
   end
 

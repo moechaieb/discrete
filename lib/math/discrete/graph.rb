@@ -3,20 +3,22 @@ class Math::Discrete::Graph
   class VertexNotUnique < StandardError; end
   class EdgeNotFound < StandardError; end
   class EdgeNotUnique < StandardError; end
-  class PropertyNotFound < StandardError; end
+  class BadEdgeType < StandardError; end
 
-  attr_reader :vertex_set, :edge_set, :name, :property_set
+  include Algorithms
+
+  attr_reader :vertex_set, :edge_set
   alias_method :node_set, :vertex_set
 
-  def self.build
-    new
+  def self.build(directed: true)
+    new directed: directed
   end
 
   def self.build_from_sets(vertex_set: Set[], edge_set: Set[])
     raise Math::Discrete::TypeError, 'vertex_set must be of type Set' unless vertex_set.is_a? Set
     raise Math::Discrete::TypeError, 'edge_set must be of type Set' unless edge_set.is_a? Set
 
-    graph = new
+    graph = edge_set.empty? ? new : new(directed: edge_set.first.directed?)
 
     graph.add_vertices! vertex_set
     graph.add_edges! edge_set
@@ -24,7 +26,7 @@ class Math::Discrete::Graph
     graph
   end
 
-  def self.build_from_labels(vertex_labels: Set[], edge_labels: Set[])
+  def self.build_from_labels(directed: true, vertex_labels: Set[], edge_labels: Set[])
     raise Math::Discrete::TypeError, 'vertex_labels must be of type Set' unless vertex_labels.is_a? Set
     raise Math::Discrete::TypeError, 'edge_labels must be of type Set' unless edge_labels.is_a? Set
 
@@ -37,7 +39,11 @@ class Math::Discrete::Graph
       raise VertexNotFound, "could not find a vertex with label=#{label_set.first}" if from.nil?
       raise VertexNotFound, "could not find a vertex with label=#{label_set.to_a.last}" if to.nil?
 
-      Edge.new from: from, to: to
+      if directed
+        Edge::Directed.build from: from, to: to
+      else
+        Edge::Undirected.build_between from, to
+      end
     end
 
     build_from_sets vertex_set: Set[*vertices], edge_set: Set[*edges]
@@ -47,7 +53,7 @@ class Math::Discrete::Graph
     raise Math::Discrete::TypeError, 'vertex must be of the type Math::Discrete::Graph::Vertex' unless vertex.is_a? Vertex
     raise VertexNotUnique, 'vertex labels must be unique' unless unique_vertex? vertex
 
-    clear_property_map!
+    clear_properties!
 
     @vertex_set.add vertex
   end
@@ -61,8 +67,10 @@ class Math::Discrete::Graph
   def add_edge!(edge)
     raise Math::Discrete::TypeError, 'edge must be of the type Math::Discrete::Graph::Edge' unless edge.is_a? Edge
     raise EdgeNotUnique, 'edge already exists in graph' unless unique_edge? edge
+    raise BadEdgeType, 'edge is undirected but graph is directed' if directed? && !edge.directed?
+    raise BadEdgeType, 'edge is directed but graph is undirected' if !directed? && edge.directed?
 
-    clear_property_map!
+    clear_properties!
 
     @edge_set.add edge
   end
@@ -75,7 +83,7 @@ class Math::Discrete::Graph
     raise Math::Discrete::TypeError, 'vertex must be of the type Math::Discrete::Graph::Vertex' unless vertex.is_a? Vertex
 
     find_vertex_by_label! vertex.label
-    clear_property_map!
+    clear_properties!
 
     @edge_set.delete_if { |edge| edge.labels.include? vertex.label }
     @vertex_set.delete vertex
@@ -89,9 +97,9 @@ class Math::Discrete::Graph
 
   def remove_edge!(edge)
     raise Math::Discrete::TypeError, 'edge must be of the type Math::Discrete::Graph::Edge' unless edge.is_a? Edge
+    raise EdgeNotFound, "could not find a edge with labels=(#{edge.from.label},#{edge.to.label})" unless @edge_set.include? edge
 
-    find_edge_by_labels! *edge.labels
-    clear_property_map!
+    clear_properties!
 
     @edge_set.delete edge
   end
@@ -120,21 +128,19 @@ class Math::Discrete::Graph
         from = find_vertex_by_label! from_label
         to = find_vertex_by_label! to_label
 
-        edge.from == from && edge.to == to
+        other_edge = if directed?
+          Math::Discrete::Graph::Edge::Directed.build from: from, to: to
+        else
+          Math::Discrete::Graph::Edge::Undirected.build_between from, to
+        end
+
+        edge == other_edge
       end
     rescue VertexNotFound
       raise EdgeNotFound, "could not find a edge with labels=(#{from_label},#{to_label})"
     end
 
     raise EdgeNotFound, "could not find a edge with labels=(#{from_label},#{to_label})" if result.nil?
-
-    result
-  end
-
-  def find_property_by_name!(name)
-    result = @property_set.find { |property| property.name == name.to_sym }
-
-    raise PropertyNotFound, "could not find property with name=#{name}" if result.nil?
 
     result
   end
@@ -148,19 +154,30 @@ class Math::Discrete::Graph
     Set[*@edge_set.map(&:labels)]
   end
 
-  def satisfies_property?(name)
-    return @property_map[name] unless @property_map[name].nil?
+  def directed?
+    @directed
+  end
 
-    find_property_by_name!(name).satisfied? self
+  def satisfies_property?(property)
+    property_name = property.name.to_sym
+
+    return @properties[property_name] if @properties[property_name].present?
+
+    @properties[property_name] = property.satisfied? self
+    return @properties.fetch property_name
+  end
+
+  def determine_properties!(properties = Properties::all)
+    properties.map { |property| satisfies_property? property }
   end
 
   private
 
-  def initialize(vertex_set: Set[], edge_set: Set[], property_set: Properties::all)
+  def initialize(directed: true, vertex_set: Set[], edge_set: Set[])
     @vertex_set = vertex_set
     @edge_set = edge_set
-    @property_set = property_set
-    @property_map = {}
+    @directed = directed
+    @properties = {}
   end
 
   def unique_vertex?(vertex)
@@ -172,20 +189,10 @@ class Math::Discrete::Graph
   end
 
   def unique_edge?(edge)
-    find_edge_by_labels! *edge.labels
-
-    false
-  rescue EdgeNotFound
-    true
+    @edge_set.find { |other_edge| edge == other_edge }.nil?
   end
 
-  def build_property_map!
-    @property_map = @property_set.map(&:name).reduce do |map, property_name|
-      map.merge property_name => satisfies_property?(property_name)
-    end
-  end
-
-  def clear_property_map!
-    @property_map = {}
+  def clear_properties!
+    @properties = {}
   end
 end

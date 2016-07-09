@@ -1,7 +1,11 @@
 class Math::Discrete::Property
+  class NameNotUnique < StandardError; end
+
   attr_reader :name, :structure_class
 
   def self.build(name:, structure_class:, &block)
+    raise NameNotUnique if name.in? ::Math::Discrete::structure_class.constantize::Properties.all.map(&:name)
+
     new name: name, structure_class: structure_class, satisfiability_test: block
   end
 

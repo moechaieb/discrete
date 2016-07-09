@@ -5,4 +5,5 @@ gemspec
 
 gem 'algorithms'
 gem 'pry'
+gem 'pry-byebug'
 gem 'codecov', require: false, group: :test
