@@ -3,8 +3,8 @@ require 'spec_helper'
 describe Math::Discrete::Graph::Edge do
   let(:first_vertex) { Math::Discrete::Graph::Vertex.build_from_label 'A' }
   let(:second_vertex) { Math::Discrete::Graph::Vertex.build_from_label 'B' }
-  let(:directed_edge) { Math::Discrete::Graph::Edge::Directed.build from: first_vertex, to: second_vertex }
-  let(:undirected_edge) { Math::Discrete::Graph::Edge::Undirected.build_between first_vertex, second_vertex }
+  let(:directed_edge) { described_class::Directed.build from: first_vertex, to: second_vertex }
+  let(:undirected_edge) { described_class::Undirected.build_between first_vertex, second_vertex }
 
   context '::Directed' do
     describe '::build' do
@@ -19,8 +19,8 @@ describe Math::Discrete::Graph::Edge do
       end
 
       it 'raises a TypeError when given objects of non-Vertex type as input' do
-        expect { Math::Discrete::Graph::Edge::Directed.build from: 'Not a vertex', to: second_vertex }.to raise_error Math::Discrete::TypeError
-        expect { Math::Discrete::Graph::Edge::Directed.build from: first_vertex, to: 'Not a vertex' }.to raise_error Math::Discrete::TypeError
+        expect { described_class::Directed.build from: 'Not a vertex', to: second_vertex }.to raise_error Math::Discrete::TypeError
+        expect { described_class::Directed.build from: first_vertex, to: 'Not a vertex' }.to raise_error Math::Discrete::TypeError
       end
     end
   end
@@ -38,14 +38,31 @@ describe Math::Discrete::Graph::Edge do
       end
 
       it 'raises a TypeError when given objects of non-Vertex type as input' do
-        expect { Math::Discrete::Graph::Edge::Undirected.build_between 'Not a vertex', second_vertex }.to raise_error Math::Discrete::TypeError
-        expect { Math::Discrete::Graph::Edge::Undirected.build_between first_vertex, 'Not a vertex' }.to raise_error Math::Discrete::TypeError
+        expect { described_class::Undirected.build_between 'Not a vertex', second_vertex }.to raise_error Math::Discrete::TypeError
+        expect { described_class::Undirected.build_between first_vertex, 'Not a vertex' }.to raise_error Math::Discrete::TypeError
       end
     end
   end
 
   describe '#==' do
+    let(:third_vertex) { Math::Discrete::Graph::Vertex.build_from_label 'B' }
+    let(:same_undirected_edge) { described_class::Undirected.build_between second_vertex, first_vertex }
+    let(:same_directed_edge) { described_class::Directed.build from: first_vertex, to: second_vertex }
 
+    it 'returns false when undirected and other_edge is directed or vice versa' do
+      expect(directed_edge).not_to eq undirected_edge
+      expect(undirected_edge).not_to eq directed_edge
+    end
+
+    it 'returns true if both edges are directed, originate from the same vertex and end at the same vertex' do
+      expect(same_directed_edge).to eq directed_edge
+      expect(directed_edge).to eq same_directed_edge
+    end
+
+    it 'returns true if both edges are undirected and between the same vertices' do
+      expect(undirected_edge).to eq same_undirected_edge
+      expect(same_undirected_edge).to eq undirected_edge
+    end
   end
 
   describe '#labels' do

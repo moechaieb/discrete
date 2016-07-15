@@ -7,7 +7,7 @@ class Math::Discrete::Graph
 
   include Algorithms
 
-  attr_reader :vertex_set, :edge_set
+  attr_reader :vertex_set, :edge_set, :properties
   alias_method :node_set, :vertex_set
 
   def self.build(directed: true)
@@ -158,17 +158,19 @@ class Math::Discrete::Graph
     @directed
   end
 
-  def satisfies_property?(property)
+  def satisfies?(property)
     property_name = property.name.to_sym
 
-    return @properties[property_name] if @properties[property_name].present?
+    return @properties[property_name] unless @properties[property_name].nil?
 
     @properties[property_name] = property.satisfied? self
-    return @properties.fetch property_name
+    @properties.fetch property_name
   end
 
   def determine_properties!(properties = Properties::all)
-    properties.map { |property| satisfies_property? property }
+    properties.map { |property| satisfies? property }
+
+    @properties
   end
 
   private

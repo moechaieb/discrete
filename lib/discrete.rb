@@ -6,6 +6,7 @@ module Math::Discrete
   class Graph; end
   class Graph::Vertex; end
   class Graph::Edge; end
+  module Graph::Properties; end
   module Graph::Algorithms; end
 end
 

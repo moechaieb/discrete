@@ -1,24 +1,40 @@
 module Math::Discrete::Graph::Properties
   class << self
     def all
-      Set[bipartite].freeze
+      [
+        bipartiteness,
+        completeness,
+        planarity,
+        regularity
+      ]
     end
 
-    def bipartite
-      Math::Discrete::Property.build name: :bipartite, structure_class: Math::Discrete::Graph do |graph|
+    def bipartiteness
+      Math::Discrete::Property.build name: :bipartiteness, structure_type: :graph do |graph|
         false
       end
     end
 
-    def complete
-      Math::Discrete::Property.build name: :complete, structure_class: Math::Discrete::Graph do |graph|
+    def completeness
+      Math::Discrete::Property.build name: :completeness, structure_type: :graph do |graph|
+        n = graph.vertex_set.size
+        m = graph.edge_set.size
+
+        m == (n * (n - 1)) / 2
+      end
+    end
+
+    def planarity
+      Math::Discrete::Property.build name: :planarity, structure_type: :graph do |graph|
         false
       end
     end
 
-    def planar
-      Math::Discrete::Property.build name: :planar, structure_class: Math::Discrete::Graph do |graph|
-        false
+    def regularity
+      Math::Discrete::Property.build name: :regularity, structure_type: :graph do |graph|
+        vertices = graph.vertex_set
+
+        vertices.map { |vertex| vertex.adjacent_vertices.size }.uniq.size == 1
       end
     end
   end
