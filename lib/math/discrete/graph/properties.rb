@@ -20,7 +20,7 @@ module Math::Discrete::Graph::Properties
         n = graph.vertex_set.size
         m = graph.edge_set.size
 
-        m == (n * (n - 1)) / 2
+        m == (n * (n - 1)) / (graph.directed? ? 1 : 2)
       end
     end
 
