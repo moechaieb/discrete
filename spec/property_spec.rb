@@ -4,18 +4,18 @@ describe Math::Discrete::Property do
   describe '::build' do
     it 'raises an InvalidStructureType if the given structure_type is unknown' do
       expect {
-        described_class.build(name: :test_prop, structure_type: :yolo) { |_| _ }
+        described_class.build(name: :test_prop, adjective: :test, structure_type: :yolo) { |_| _ }
       }.to raise_error described_class::InvalidStructureType
     end
 
     it 'raises a SatisfiabilityTestMissing if no block is given' do
       expect {
-        described_class.build name: :test_prop, structure_type: :graph
+        described_class.build name: :test_prop, adjective: :test, structure_type: :graph
       }.to raise_error described_class::SatisfiabilityTestMissing
     end
 
     it 'creates a new property with the given arguments when supplied a block' do
-      property = described_class.build(name: :test_prop, structure_type: :graph) { |_| true }
+      property = described_class.build(name: :test_prop, adjective: :test, structure_type: :graph) { |_| true }
 
       expect(property.name).to be :test_prop
       expect(property.structure_type).to be :graph
@@ -24,13 +24,13 @@ describe Math::Discrete::Property do
 
   describe '#satisfied?' do
     let(:property) do
-      described_class.build name: :even_number_of_vertices?, structure_type: :graph do |graph|
+      described_class.build name: :even, adjective: :even_number_of_vertices, structure_type: :graph do |graph|
         graph.vertex_set.size % 2 == 0
       end
     end
 
     let(:bad_property) do
-      described_class.build name: :even_number_of_vertices?, structure_type: :graph do |graph|
+      described_class.build name: :even, adjective: :even_number_of_vertices, structure_type: :graph do |graph|
         graph.vertex_set.size
       end
     end
