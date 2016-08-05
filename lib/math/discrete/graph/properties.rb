@@ -14,7 +14,7 @@ module Math::Discrete::Graph::Properties
         n = graph.vertex_set.size
         m = graph.edge_set.size
 
-        next false if m > (n * n) / 4
+        break false if m > (n * n) / 4
 
         bfs_tree = graph.breadth_first_search
 
@@ -26,12 +26,10 @@ module Math::Discrete::Graph::Properties
 
         bfs_tree[root_label][:parent] = super_parent.label unless super_parent.nil?
 
-        bfs_tree.each do |label, search_tree_data|
-          bfs_tree[label][:color] = search_tree_data[:distance].odd? ? :blue : :red
-        end
-
         bfs_tree.none? do |label, search_tree_data|
           next if search_tree_data[:parent].nil?
+
+          bfs_tree[label][:color] = search_tree_data[:distance].odd? ? :blue : :red
 
           bfs_tree[label][:color] == bfs_tree[search_tree_data[:parent]][:color]
         end
