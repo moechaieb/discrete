@@ -8,7 +8,7 @@ class Math::Discrete::Graph::Edge
   end
 
   module Directed
-    def self.build(from: from, to: to)
+    def self.build(from:, to:)
       ::Math::Discrete::Graph::Edge.new directed: true, from: from, to: to
     end
   end
@@ -37,7 +37,7 @@ class Math::Discrete::Graph::Edge
   def initialize(from: , to:, directed: true)
     raise Math::Discrete::TypeError, 'from must be of type Math::Discrete::Graph::Vertex' unless from.is_a? Vertex
     raise Math::Discrete::TypeError, 'to must be of type Math::Discrete::Graph::Vertex' unless to.is_a? Vertex
-    raise Math::Discrete::TypeError, 'directed must be of Boolean type' unless !!directed == directed
+    raise Math::Discrete::TypeError, 'directed must be of a boolean type' unless !!directed == directed
 
     @from = from
     @to = to
