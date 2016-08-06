@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Math::Discrete::Graph::Edge do
-  let(:first_vertex) { Math::Discrete::Graph::Vertex.build_from_label 'A' }
-  let(:second_vertex) { Math::Discrete::Graph::Vertex.build_from_label 'B' }
+  let(:first_vertex) { Graph::Vertex.build_from_label 'A' }
+  let(:second_vertex) { Graph::Vertex.build_from_label 'B' }
   let(:directed_edge) { described_class::Directed.build from: first_vertex, to: second_vertex }
   let(:undirected_edge) { described_class::Undirected.build_between first_vertex, second_vertex }
 
@@ -45,7 +45,7 @@ describe Math::Discrete::Graph::Edge do
   end
 
   describe '#==' do
-    let(:third_vertex) { Math::Discrete::Graph::Vertex.build_from_label 'B' }
+    let(:third_vertex) { Graph::Vertex.build_from_label 'B' }
     let(:same_undirected_edge) { described_class::Undirected.build_between second_vertex, first_vertex }
     let(:same_directed_edge) { described_class::Directed.build from: first_vertex, to: second_vertex }
 

@@ -40,14 +40,14 @@ describe Math::Discrete::Property do
     end
 
     it 'raises a TypeError if the satisfiability_test returns a non-Boolean result' do
-      graph = Math::Discrete::Graph.build
+      graph = Graph.build
 
       expect { bad_property.satisfied? graph }.to raise_error Math::Discrete::TypeError
     end
 
     it 'returns the result of the satisfiability_test if the structure and result types are correct' do
-      graph = Math::Discrete::Graph.build_from_labels vertex_labels: Set['a', 'b'], edge_labels: Set[%w(a b)]
-      other_graph = Math::Discrete::Graph.build_from_labels vertex_labels: Set['a', 'b', 'c'], edge_labels: Set[%w(a b), %w(b c)]
+      graph = Graph.build_from_labels vertex_labels: Set['a', 'b'], edge_labels: Set[%w(a b)]
+      other_graph = Graph.build_from_labels vertex_labels: Set['a', 'b', 'c'], edge_labels: Set[%w(a b), %w(b c)]
 
       expect(property).to be_satisfied(graph)
       expect(property).not_to be_satisfied(other_graph)

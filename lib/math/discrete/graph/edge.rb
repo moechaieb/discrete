@@ -3,13 +3,13 @@ class Math::Discrete::Graph::Edge
 
   module Undirected
     def self.build_between(from, to)
-      ::Math::Discrete::Graph::Edge.new directed: false, from: from, to: to
+      Graph::Edge.new directed: false, from: from, to: to
     end
   end
 
   module Directed
     def self.build(from:, to:)
-      ::Math::Discrete::Graph::Edge.new directed: true, from: from, to: to
+      Graph::Edge.new directed: true, from: from, to: to
     end
   end
 

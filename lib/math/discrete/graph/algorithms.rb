@@ -5,7 +5,7 @@ module Math::Discrete::Graph::Algorithms
     return {} if @vertex_set.empty?
 
     raise Math::Discrete::TypeError, 'root must be of the type Math::Discrete::Graph::Vertex' unless root.is_a? Vertex
-    raise Math::Discrete::Graph::VertexNotFound, "could not find vertex with label=#{root.label}" unless vertex_labels.include? root.label
+    raise Graph::VertexNotFound, "could not find vertex with label=#{root.label}" unless vertex_labels.include? root.label
 
 
     search_queue = Containers::Queue.new [root]
@@ -33,7 +33,7 @@ module Math::Discrete::Graph::Algorithms
     return {} if @vertex_set.empty?
 
     raise Math::Discrete::TypeError, 'root must be of the type Math::Discrete::Graph::Vertex' unless root.is_a? Vertex
-    raise Math::Discrete::Graph::VertexNotFound, "could not find vertex with label=#{root.label}" unless vertex_labels.include? root.label
+    raise Graph::VertexNotFound, "could not find vertex with label=#{root.label}" unless vertex_labels.include? root.label
 
 
     search_stack = Containers::Stack.new [root]

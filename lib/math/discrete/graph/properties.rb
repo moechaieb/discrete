@@ -1,10 +1,23 @@
 module Math::Discrete::Graph::Properties
+  METHODS = %i(bipartiteness completeness regularity).freeze
+
   class << self
+    def each
+      all.each do |property|
+        yield(property) if block_given?
+      end
+    end
+
+    def map
+      all.map do |property|
+        yield(property) if block_given?
+      end
+    end
+
     def all
       [
         bipartiteness,
         completeness,
-        planarity,
         regularity
       ]
     end
@@ -14,11 +27,13 @@ module Math::Discrete::Graph::Properties
         n = graph.vertex_set.size
         m = graph.edge_set.size
 
-        break false if m > (n * n) / 4
+        next false if m > (n * n) / 4
 
         bfs_tree = graph.breadth_first_search
 
         root_label = bfs_tree.empty? ? nil : bfs_tree.first[0]
+
+        bfs_tree = bfs_tree.to_a.reverse.to_h
 
         super_parent = graph.vertex_set.find do |vertex|
           vertex.adjacent_vertices.map(&:label).include? root_label
@@ -42,12 +57,6 @@ module Math::Discrete::Graph::Properties
         m = graph.edge_set.size
 
         m == (n * (n - 1)) / (graph.directed? ? 1 : 2)
-      end
-    end
-
-    def planarity
-      Math::Discrete::Property.build name: :planarity, adjective: :planar, structure_type: :graph do |graph|
-        false
       end
     end
 

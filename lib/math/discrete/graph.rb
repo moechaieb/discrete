@@ -6,6 +6,7 @@ class Math::Discrete::Graph
   class BadEdgeType < StandardError; end
 
   include Algorithms
+  include Predicates
 
   attr_reader :vertex_set, :edge_set, :properties
   alias_method :node_set, :vertex_set
