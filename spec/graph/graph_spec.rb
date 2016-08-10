@@ -5,19 +5,54 @@ describe Math::Discrete::Graph do
   let(:undirected_graph) { Graph.build directed: false }
   let(:labels) { Set['A', 'B'] }
 
-  describe '::build, ::build directed: true' do
-    it 'creates a directed graph with an empty vertex set and edge set' do
-      expect(directed_graph.vertex_set).to be_empty
-      expect(directed_graph.edge_set).to be_empty
-      expect(directed_graph).to be_directed
+  describe '::[]' do
+    let(:vertex_set) { Graph::Vertex.build_from_labels 'A', 'B', 'C' }
+    let(:edge_set) do
+      Set[
+        Edge::Directed.build(from: vertex_set.entries[0], to: vertex_set.entries[1]),
+        Edge::Directed.build(from: vertex_set.entries[1], to: vertex_set.entries[0]),
+        Edge::Directed.build(from: vertex_set.entries[1], to: vertex_set.entries[2]),
+        Edge::Directed.build(from: vertex_set.entries[2], to: vertex_set.entries[1])
+      ]
+    end
+    let(:graph_from_sets) { Graph[vertex_set, edge_set] }
+    let(:graph_from_labels) { Graph[[1, 2, 3], [[1, 2], [2, 3], [3, 1], [1, 3]]] }
+
+    it 'raises a TypeError if the given vertex set or label set is not a Set or an Array' do
+      expect { Graph['vertices', Set[]] }.to raise_error Math::Discrete::TypeError
+    end
+
+    it 'raises a TypeError if the given edge set or label set is not a Set or an Array' do
+      expect { Graph[Set[], 'edges'] }.to raise_error Math::Discrete::TypeError
+    end
+
+    it 'builds a graph from the given vertex set and edge set' do
+      expect(graph_from_sets).to be_a Graph
+      expect(graph_from_sets.vertex_set).to eq vertex_set
+      expect(graph_from_sets.edge_set).to eq edge_set
+    end
+
+    it 'builds a graph from the given vertex label set and edge label set' do
+      expect(graph_from_labels).to be_a Graph
+      expect(graph_from_labels.vertex_labels).to eq Set[1, 2, 3]
     end
   end
 
-  describe '::build directed: false' do
-    it 'creates an undirected graph with an empty vertex set and edge set' do
-      expect(undirected_graph.vertex_set).to be_empty
-      expect(undirected_graph.edge_set).to be_empty
-      expect(undirected_graph).not_to be_directed
+  describe '::build' do
+    describe 'directed: true' do
+      it 'creates a directed graph with an empty vertex set and edge set' do
+        expect(directed_graph.vertex_set).to be_empty
+        expect(directed_graph.edge_set).to be_empty
+        expect(directed_graph).to be_directed
+      end
+    end
+
+    describe 'directed: false' do
+      it 'creates an undirected graph with an empty vertex set and edge set' do
+        expect(undirected_graph.vertex_set).to be_empty
+        expect(undirected_graph.edge_set).to be_empty
+        expect(undirected_graph).not_to be_directed
+      end
     end
   end
 

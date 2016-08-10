@@ -11,30 +11,27 @@ class Math::Discrete::Graph
   attr_reader :vertex_set, :edge_set, :properties
   alias_method :node_set, :vertex_set
 
-  def self.[](vertex_set_or_labels = Set[], edge_set_or_labels = Set[])
-    unless vertex_set_or_labels.is_a?(Set) || vertex_set_or_labels.is_a?(Array)
+  def self.[](vertices_or_labels = Set[], edges_or_labels = Set[])
+    unless vertices_or_labels.is_a?(Set) || vertices_or_labels.is_a?(Array)
       raise Math::Discrete::TypeError, 'vertices must be of type Set or Array'
     end
 
-    unless edge_set_or_labels.is_a?(Set) || edge_set_or_labels.is_a?(Array)
+    unless edges_or_labels.is_a?(Set) || edges_or_labels.is_a?(Array)
       raise Math::Discrete::TypeError, 'edges must be of type Set or Array'
     end
 
-    vertex_types = vertex_set_or_labels.map(&:class).uniq
-    edge_types = edge_set_or_labels.map(&:class).uniq
-
-    raise Math::Discrete::TypeError, 'all vertices must be of same type' unless vertex_types.size <= 1
-    raise Math::Discrete::TypeError, 'all edges must be of same type' unless edge_types.size <= 1
+    vertex_types = vertices_or_labels.map(&:class).uniq
+    edge_types = edges_or_labels.map(&:class).uniq
 
     if vertex_types == [Vertex] && edge_types == [Edge]
       build_from_sets(
-        vertex_set: Set[*vertex_set_or_labels],
-        edge_set_or_labels: Set[*edge_set_or_labels]
+        vertex_set: Set[*vertices_or_labels],
+        edge_set: Set[*edges_or_labels]
       )
     else
       build_from_labels(
-        vertex_labels: Set[*vertex_set_or_labels],
-        edge_labels: Set[*edge_set_or_labels]
+        vertex_labels: Set[*vertices_or_labels],
+        edge_labels: Set[*edges_or_labels]
       )
     end
   end

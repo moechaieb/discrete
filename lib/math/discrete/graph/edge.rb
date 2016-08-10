@@ -24,9 +24,11 @@ class Math::Discrete::Graph::Edge
 
   def ==(other_edge)
     return false unless directed? == other_edge.directed?
-
     return from == other_edge.from && to == other_edge.to if directed?
-    from == other_edge.from && to == other_edge.to || from == other_edge.to && to == other_edge.from
+    return true if from == other_edge.from && to == other_edge.to
+    return true if from == other_edge.to && to == other_edge.from
+
+    false
   end
 
   def directed?
