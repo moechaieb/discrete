@@ -159,6 +159,10 @@ class Math::Discrete::Graph
     @directed
   end
 
+  def weighted?
+    @edge_set.any? &:weighted?
+  end
+
   def satisfies?(property)
     property_name = property.name.to_sym
 

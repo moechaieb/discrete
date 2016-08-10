@@ -22,6 +22,10 @@ describe Math::Discrete::Graph::Edge do
         expect { described_class::Directed.build from: 'Not a vertex', to: second_vertex }.to raise_error Math::Discrete::TypeError
         expect { described_class::Directed.build from: first_vertex, to: 'Not a vertex' }.to raise_error Math::Discrete::TypeError
       end
+
+      it 'raises a TypeError when given a non-numeric weight' do
+        expect { described_class::Directed.build from: 'Not a vertex', to: second_vertex, weight: '1' }.to raise_error Math::Discrete::TypeError
+      end
     end
   end
 
@@ -40,6 +44,10 @@ describe Math::Discrete::Graph::Edge do
       it 'raises a TypeError when given objects of non-Vertex type as input' do
         expect { described_class::Undirected.build_between 'Not a vertex', second_vertex }.to raise_error Math::Discrete::TypeError
         expect { described_class::Undirected.build_between first_vertex, 'Not a vertex' }.to raise_error Math::Discrete::TypeError
+      end
+
+      it 'raises a TypeError when given a non-numeric weight' do
+        expect { described_class::Undirected.build_between 'Not a vertex', second_vertex, weight: '1' }.to raise_error Math::Discrete::TypeError
       end
     end
   end
@@ -80,6 +88,18 @@ describe Math::Discrete::Graph::Edge do
 
       expect(vertices).to be_a Set
       expect(vertices).to contain_exactly first_vertex, second_vertex
+    end
+  end
+
+  describe '#weighted?' do
+    it 'returns true if the weight is different from 1' do
+      directed_edge.weight = 2
+
+      expect(directed_edge).to be_weighted
+    end
+
+    it 'returns false if the weight is equal to 1' do
+      expect(undirected_edge).not_to be_weighted
     end
   end
 end
