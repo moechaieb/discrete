@@ -18,7 +18,7 @@ class Math::Discrete::Graph::Edge
     Set[from.label, to.label]
   end
 
-  def to_set
+  def vertices
     Set[from, to]
   end
 

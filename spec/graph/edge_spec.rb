@@ -82,9 +82,9 @@ describe Math::Discrete::Graph::Edge do
     end
   end
 
-  describe '#to_set' do
+  describe '#vertices' do
     it 'returns a set of the vertices connected by the edge' do
-      vertices = directed_edge.to_set
+      vertices = directed_edge.vertices
 
       expect(vertices).to be_a Set
       expect(vertices).to contain_exactly first_vertex, second_vertex
