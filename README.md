@@ -33,9 +33,18 @@ Structures:
 
 Algorithms:
 
-- [ ] Graph algorithms: search, traversal, colouring
-- [ ] Approximation algorithms
-- [ ] Optimization algorithms
+- Graph algorithms:
+  - Deterministic algorithms:
+    - Breadth-first search
+    - Depth-first search
+    - Shortest path
+    - Minimum spanning tree
+    - Maximum flow
+    - More TBD
+  - Aproximation algorithms
+    - Graph Colouring
+    - Traveling salesman
+
 
 ## Usage
 
