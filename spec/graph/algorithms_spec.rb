@@ -1,12 +1,10 @@
 require 'spec_helper'
 
 describe Graph::Algorithms do
-  let(:empty_directed_graph) { Graph.build }
+  let(:empty_directed_graph) { Graph[] }
   let(:empty_undirected_graph) { Graph.build directed: false }
-  let(:directed_graph) {
-    Graph.build_from_labels vertex_labels: Set[1,2,3,4], edge_labels: Set[[1,2],[2,3],[3,1], [1,4], [4,2]]
-  }
-  let(:foreign_vertex) { Graph::Vertex.build_from_label 'Z' }
+  let(:directed_graph) { Graph[[1,2,3,4], [[1,2],[2,3],[3,1], [1,4], [4,2]]] }
+  let(:foreign_vertex) { Vertex['Z'] }
 
   describe '#breadth_first_search' do
     let(:search_tree) { directed_graph.breadth_first_search }

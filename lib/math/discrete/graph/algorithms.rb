@@ -1,8 +1,8 @@
 require 'algorithms'
 
 module Math::Discrete::Graph::Algorithms
-  def breadth_first_search(root: @vertex_set.first)
-    return {} if @vertex_set.empty?
+  def breadth_first_search(root: vertex_set.first)
+    return {} if @vertex_map.empty?
 
     raise Math::Discrete::TypeError, 'root must be of the type Math::Discrete::Graph::Vertex' unless root.is_a? Vertex
     raise Graph::VertexNotFound, "could not find vertex with label=#{root.label}" unless vertex_labels.include? root.label
@@ -29,8 +29,8 @@ module Math::Discrete::Graph::Algorithms
     search_tree
   end
 
-  def depth_first_search(root: @vertex_set.first)
-    return {} if @vertex_set.empty?
+  def depth_first_search(root: vertex_set.first)
+    return {} if @vertex_map.empty?
 
     raise Math::Discrete::TypeError, 'root must be of the type Math::Discrete::Graph::Vertex' unless root.is_a? Vertex
     raise Graph::VertexNotFound, "could not find vertex with label=#{root.label}" unless vertex_labels.include? root.label

@@ -18,6 +18,7 @@ require 'math/discrete/graph/vertex'
 require 'math/discrete/graph/edge'
 require 'math/discrete/graph/path'
 
+TypeError = Math::Discrete::TypeError
 Graph = Math::Discrete::Graph
 Vertex = Graph::Vertex
 Node = Vertex
