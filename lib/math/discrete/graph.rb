@@ -71,15 +71,17 @@ class Math::Discrete::Graph
 
       edges = edge_labels.map do |label_set|
         from = vertices.find { |vertex| vertex.label == label_set.first }
-        to = vertices.find { |vertex| vertex.label == label_set.to_a.last }
+        to = vertices.find { |vertex| vertex.label == label_set.to_a[1] }
+        weight = label_set.to_a[2] || 1
 
         raise VertexNotFound, "could not find a vertex with label=#{ label_set.first }" if from.nil?
         raise VertexNotFound, "could not find a vertex with label=#{ label_set.to_a.last }" if to.nil?
+        raise TypeError, 'edge weight must be of a Numeric type' unless weight.is_a? Numeric
 
         if directed
-          Edge::Directed[from, to]
+          Edge::Directed[from, to, weight]
         else
-          Edge::Undirected[from, to]
+          Edge::Undirected[from, to, weight]
         end
       end
 
@@ -189,7 +191,7 @@ class Math::Discrete::Graph
   alias_method :node_set, :vertex_set
 
   def vertex_labels
-    vertex_set.map(&:label).to_set
+    @vertex_map.keys.to_set
   end
   alias_method :node_labels, :vertex_labels
 

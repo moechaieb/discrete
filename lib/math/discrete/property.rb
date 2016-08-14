@@ -18,13 +18,13 @@ class Math::Discrete::Property
 
   def satisfied?(structure)
     unless Math::Discrete.const_get(structure_type.capitalize) == structure.class
-      raise Math::Discrete::TypeError, "structure must of type Math::Discrete::#{structure_type.capitalize}"
+      raise TypeError, "structure must of type Math::Discrete::#{structure_type.capitalize}"
     end
 
     result = @satisfiability_test.call structure
 
     unless [true, false].include? result
-      raise Math::Discrete::TypeError, 'satisfiability_test must return a Boolean type'
+      raise TypeError, 'satisfiability_test must return a Boolean type'
     end
 
     result

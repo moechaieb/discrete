@@ -15,7 +15,7 @@ describe Math::Discrete::Graph::Properties do
   end
 
   described_class::METHODS.each do |property_method|
-    describe property_method do
+    describe "##{property_method}" do
       it "builds a property called #{property_method}" do
         expect(Graph::Properties.send(property_method).name).to be property_method
       end

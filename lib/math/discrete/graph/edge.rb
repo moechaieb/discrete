@@ -4,10 +4,10 @@ class Math::Discrete::Graph::Edge
 
   private_class_method :new
   def initialize(from: , to:, directed: true, weight: 1)
-    raise Math::Discrete::TypeError, 'from must be of type Math::Discrete::Graph::Vertex' unless from.is_a? Vertex
-    raise Math::Discrete::TypeError, 'to must be of type Math::Discrete::Graph::Vertex' unless to.is_a? Vertex
-    raise Math::Discrete::TypeError, 'directed must be of a Boolean type' unless !!directed == directed
-    raise Math::Discrete::TypeError, 'weight must be of a Numeric type' unless weight.is_a? Numeric
+    raise TypeError, 'from must be of type Math::Discrete::Graph::Vertex' unless from.is_a? Vertex
+    raise TypeError, 'to must be of type Math::Discrete::Graph::Vertex' unless to.is_a? Vertex
+    raise TypeError, 'directed must be of a Boolean type' unless !!directed == directed
+    raise TypeError, 'weight must be of a Numeric type' unless weight.is_a? Numeric
 
     @from = from
     @to = to

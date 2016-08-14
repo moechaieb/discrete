@@ -20,17 +20,19 @@ class Math::Discrete::Graph::Vertex
   end
 
   def adjacent_to?(other_vertex)
-    raise Math::Discrete::TypeError, 'other_vertex must be of type Math::Discrete::Vertex' unless other_vertex.is_a? Vertex
+    raise TypeError, 'other_vertex must be of type Math::Discrete::Vertex' unless other_vertex.is_a? Vertex
 
     @adjacent_vertices.include? other_vertex
   end
 
   def distance_to(other_vertex)
-    raise Math::Discrete::Graph::VertexNotFound, '' unless adjacent_to
+    raise Math::Discrete::Graph::VertexNotFound, 'vertex must be adjacent' unless adjacent_to? other_vertex
+
+    @edge_weights[other_vertex.label]
   end
 
   def ==(other_vertex)
-    raise Math::Discrete::TypeError, 'other_vertex must be of type Math::Discrete::Vertex' unless other_vertex.is_a? Vertex
+    raise TypeError, 'other_vertex must be of type Math::Discrete::Vertex' unless other_vertex.is_a? Vertex
 
     label == other_vertex.label
   end

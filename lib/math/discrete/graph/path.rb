@@ -6,18 +6,17 @@ class Math::Discrete::Graph::Path
     @edges = edges
   end
 
-  def self.[](edges = [])
-    raise Math::Discrete::TypeError, 'edges must be an Array' unless edges.is_a? Array
+  def self.[](*edges)
     raise Math::Discrete::Graph::EdgeNotUnique, 'edges must be unique' unless edges.uniq.size == edges.size
     raise InvalidPath, 'must be a valid continuous path' unless valid_path?(edges)
 
     new edges
   end
 
-  def cycle?
+  def cyclical?
     return false if @edges.empty?
 
-    labels.first.first == labels.last.last
+    labels.first.first == labels.to_a.last.to_a.last
   end
 
   def labels
