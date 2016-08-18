@@ -1,6 +1,8 @@
 require 'algorithms'
 
 module Math::Discrete::Graph::Algorithms
+  class NegativeWeightCycleError < StandardError; end
+
   def breadth_first_search(root: vertex_set.first)
     return {} if @vertex_map.empty?
 
@@ -64,6 +66,25 @@ module Math::Discrete::Graph::Algorithms
 
     return Graph::Path[] if source == target
 
+    distance_tree = if @edge_set.map(&:weight).all? { |weight| weight > 0 }
+      dijkstras_algorithm(source, target)
+    else
+      bellman_fords_algorithm(source, target)
+    end
+
+    edges = []
+    current_vertex = target.label
+    until distance_tree[current_vertex][:parent].nil? do
+      edges << find_edge_by_labels!(distance_tree[current_vertex][:parent], current_vertex)
+      current_vertex = distance_tree[current_vertex][:parent]
+    end
+
+    Graph::Path[*edges.reverse]
+  end
+
+  private
+
+  def dijkstras_algorithm(source, target)
     distance_tree = { source.label => { distance: 0, parent: nil } }
     priority_queue = Containers::PriorityQueue.new do |a,b|
       (distance_tree[a][:distance] <=> distance_tree[b][:distance]) == -1
@@ -93,13 +114,36 @@ module Math::Discrete::Graph::Algorithms
       end
     end
 
-    edges = []
-    current_vertex = target.label
-    until distance_tree[current_vertex][:parent].nil? do
-      edges << find_edge_by_labels!(distance_tree[current_vertex][:parent], current_vertex)
-      current_vertex = distance_tree[current_vertex][:parent]
+    distance_tree
+  end
+
+  def bellman_fords_algorithm(source, target)
+    distance_tree = { source.label => { distance: 0, parent: nil } }
+
+    vertex_set.each do |vertex|
+      unless vertex == source
+        distance_tree[vertex.label] = {
+          distance: Float::INFINITY,
+          parent: nil
+        }
+      end
     end
 
-    Graph::Path[*edges.reverse]
+    (vertex_set.size - 1).times do
+      @edge_set.each do |edge|
+        if distance_tree[edge.from.label][:distance] + edge.weight < distance_tree[edge.to.label][:distance]
+          distance_tree[edge.to.label][:distance] = distance_tree[edge.from.label][:distance] + edge.weight
+          distance_tree[edge.to.label][:parent] = edge.from.label
+        end
+      end
+    end
+
+    @edge_set.each do |edge|
+      if distance_tree[edge.from.label][:distance] + edge.weight < distance_tree[edge.to.label][:distance]
+        raise NegativeWeightCycleError, 'the graph contains a negative-weight cycle'
+      end
+    end
+
+    distance_tree
   end
 end
