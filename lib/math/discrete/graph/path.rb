@@ -1,16 +1,17 @@
 class Math::Discrete::Graph::Path
   class InvalidPath < StandardError; end
 
+  attr_reader :edges
+
   private_class_method :new
   def initialize(edges = Set[])
     @edges = edges
   end
 
   def self.[](*edges)
-    raise Math::Discrete::Graph::EdgeNotUnique, 'edges must be unique' unless edges.uniq.size == edges.size
     raise InvalidPath, 'must be a valid continuous path' unless valid_path?(edges)
 
-    new edges
+    new Set[*edges]
   end
 
   def cyclical?
@@ -24,16 +25,9 @@ class Math::Discrete::Graph::Path
   end
 
   def vertices
-    Set[*@edges.flat_map(&:vertices)]
+    Set[*@edges.map(&:vertices).reduce(&:+)]
   end
-
-  def directed?
-    @edges.any? &:directed?
-  end
-
-  def weighted?
-    @edges.any? &:weighted?
-  end
+  alias_method :nodes, :vertices
 
   def length
     @edges.size
@@ -42,6 +36,8 @@ class Math::Discrete::Graph::Path
   private
 
   def self.valid_path?(edges)
-    true
+    edges.each_cons(2).all? do |initial_edge, following_edge|
+      initial_edge.to == following_edge.from
+    end
   end
 end

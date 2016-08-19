@@ -63,7 +63,7 @@ class Math::Discrete::Graph
       graph
     end
 
-    def build_from_labels(directed: true, vertex_labels: Set[], edge_labels: Set[])
+    def build_from_labels(vertex_labels: Set[], edge_labels: Set[])
       raise TypeError, 'vertex_labels must be of type Set' unless vertex_labels.is_a? Set
       raise TypeError, 'edge_labels must be of type Set' unless edge_labels.is_a? Set
 
@@ -78,11 +78,7 @@ class Math::Discrete::Graph
         raise VertexNotFound, "could not find a vertex with label=#{ label_set.to_a.last }" if to.nil?
         raise TypeError, 'edge weight must be of a Numeric type' unless weight.is_a? Numeric
 
-        if directed
-          Edge::Directed[from, to, weight]
-        else
-          Edge::Undirected[from, to, weight]
-        end
+        Edge::Directed[from, to, weight]
       end
 
       build_from_sets vertex_set: Set[*vertices], edge_set: Set[*edges]

@@ -77,7 +77,7 @@ describe Math::Discrete::Graph::Edge do
     it 'returns a set of labels of the vertices connected by the edge' do
       labels = directed_edge.labels
 
-      expect(labels).to be_a Set
+      expect(labels).to be_an_instance_of Set
       expect(labels).to contain_exactly 'A', 'B'
     end
   end
@@ -86,7 +86,7 @@ describe Math::Discrete::Graph::Edge do
     it 'returns a set of the vertices connected by the edge' do
       vertices = directed_edge.vertices
 
-      expect(vertices).to be_a Set
+      expect(vertices).to be_an_instance_of Set
       expect(vertices).to contain_exactly first_vertex, second_vertex
     end
   end

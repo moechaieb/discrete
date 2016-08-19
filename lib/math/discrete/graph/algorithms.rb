@@ -59,8 +59,8 @@ module Math::Discrete::Graph::Algorithms
     search_tree
   end
 
-  def shortest_path_between(source: , target:)
-    raise TypeError, 'source and target must be of type Vertex' unless source.is_a?(Vertex) && target.is_a?(Vertex)
+  def shortest_path_between(source, target)
+    raise TypeError, 'source and target vertices must be of type Vertex' unless source.is_a?(Vertex) && target.is_a?(Vertex)
     raise Graph::VertexNotFound, "could not find vertex with label=#{source.label}" unless vertex_labels.include? source.label
     raise Graph::VertexNotFound, "could not find vertex with label=#{target.label}" unless vertex_labels.include? target.label
 
@@ -92,10 +92,7 @@ module Math::Discrete::Graph::Algorithms
 
     vertex_set.each do |vertex|
       unless vertex == source
-        distance_tree[vertex.label] = {
-          distance: Float::INFINITY,
-          parent: nil
-        }
+        distance_tree[vertex.label] = { distance: Float::INFINITY, parent: nil }
       end
 
       priority_queue.push vertex, vertex.label
@@ -108,8 +105,7 @@ module Math::Discrete::Graph::Algorithms
         alt = distance_tree[vertex.label][:distance] + vertex.distance_to(neighbour)
 
         if alt < distance_tree[neighbour.label][:distance]
-          distance_tree[neighbour.label][:distance] = alt
-          distance_tree[neighbour.label][:parent] = vertex.label
+          distance_tree[neighbour.label] = { distance: alt, parent: vertex.label }
         end
       end
     end
@@ -122,18 +118,16 @@ module Math::Discrete::Graph::Algorithms
 
     vertex_set.each do |vertex|
       unless vertex == source
-        distance_tree[vertex.label] = {
-          distance: Float::INFINITY,
-          parent: nil
-        }
+        distance_tree[vertex.label] = { distance: Float::INFINITY, parent: nil }
       end
     end
 
     (vertex_set.size - 1).times do
       @edge_set.each do |edge|
-        if distance_tree[edge.from.label][:distance] + edge.weight < distance_tree[edge.to.label][:distance]
-          distance_tree[edge.to.label][:distance] = distance_tree[edge.from.label][:distance] + edge.weight
-          distance_tree[edge.to.label][:parent] = edge.from.label
+        alt = distance_tree[edge.from.label][:distance] + edge.weight
+
+        if alt < distance_tree[edge.to.label][:distance]
+          distance_tree[edge.to.label] = { distance: alt, parent: edge.from.label }
         end
       end
     end

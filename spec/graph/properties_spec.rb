@@ -21,7 +21,7 @@ describe Math::Discrete::Graph::Properties do
       end
 
       it 'defines a valid Property object for graphs' do
-        expect(Graph::Properties.send(property_method)).to be_a Math::Discrete::Property
+        expect(Graph::Properties.send(property_method)).to be_an_instance_of Math::Discrete::Property
         expect(Graph::Properties.send(property_method).structure_type).to be :graph
       end
     end
@@ -29,8 +29,8 @@ describe Math::Discrete::Graph::Properties do
 
   describe '::all' do
     it 'returns a Set of Property objects' do
-      expect(described_class.all).to be_a Array
-      expect(described_class.all).to all be_a Math::Discrete::Property
+      expect(described_class.all).to be_an_instance_of Array
+      expect(described_class.all).to all be_an_instance_of Math::Discrete::Property
       expect(described_class.map(&:structure_type)).to all be :graph
     end
   end

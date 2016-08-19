@@ -24,21 +24,25 @@ describe Math::Discrete::Graph do
     let(:graph_from_labels) { Graph[[1, 2, 3], [[1, 2], [2, 3], [3, 1], [1, 3]]] }
 
     it 'raises a TypeError if the given vertex set or label set is not a Set or an Array' do
-      expect { Graph['vertices', []] }.to raise_error TypeError
+      expect {
+        Graph['vertices', []]
+      }.to raise_error TypeError
     end
 
     it 'raises a TypeError if the given edge set or label set is not a Set or an Array' do
-      expect { Graph[[], 'edges'] }.to raise_error TypeError
+      expect {
+        Graph[[], 'edges']
+      }.to raise_error TypeError
     end
 
     it 'builds a graph from the given vertex set and edge set' do
-      expect(directed_graph_from_sets).to be_a Graph
+      expect(directed_graph_from_sets).to be_an_instance_of Graph
       expect(directed_graph_from_sets.vertex_set).to eq vertex_set
       expect(directed_graph_from_sets.edge_set).to eq directed_edge_set
     end
 
     it 'builds a directed graph from the given vertex label set and edge label set' do
-      expect(graph_from_labels).to be_a Graph
+      expect(graph_from_labels).to be_an_instance_of Graph
       expect(graph_from_labels).to be_directed
       expect(graph_from_labels.vertex_labels).to contain_exactly 1, 2, 3
     end
@@ -62,13 +66,17 @@ describe Math::Discrete::Graph do
     end
 
     it 'raises a TypeError if the input is an object of a non-Vertex type' do
-      expect { graph.add_vertex! 'This is not a vertex' }.to raise_error TypeError
+      expect {
+        graph.add_vertex! 'This is not a vertex'
+      }.to raise_error TypeError
     end
 
     it 'raises a VertexNotUnique if the vertex is already part of the vertex set' do
       graph.add_vertex! vertex
 
-      expect { graph.add_vertex! vertex }.to raise_error Graph::VertexNotUnique
+      expect {
+        graph.add_vertex! vertex
+      }.to raise_error Graph::VertexNotUnique
     end
   end
 
@@ -82,13 +90,17 @@ describe Math::Discrete::Graph do
     end
 
     it 'raises a TypeError if the input includes an object of a non-Vertex type' do
-      expect { graph.add_vertices!(vertices << 'This is not a vertex') }.to raise_error TypeError
+      expect {
+        graph.add_vertices!(vertices << 'This is not a vertex')
+      }.to raise_error TypeError
     end
 
     it 'raises a VertexNotUnique if the input includes a vertex that is already part of the vertex set' do
       graph.add_vertex! vertices.first
 
-      expect { graph.add_vertices! vertices }.to raise_error Graph::VertexNotUnique
+      expect {
+        graph.add_vertices! vertices
+      }.to raise_error Graph::VertexNotUnique
     end
   end
 
@@ -105,7 +117,9 @@ describe Math::Discrete::Graph do
     end
 
     it 'raises a TypeError if the input is an object of a non-Edge type' do
-      expect { directed_graph.add_edge! 'This is not an edge' }.to raise_error TypeError
+      expect {
+        directed_graph.add_edge! 'This is not an edge'
+      }.to raise_error TypeError
     end
 
     it 'raises a EdgeNotUnique if the edge is already part of the edge set' do
@@ -136,7 +150,9 @@ describe Math::Discrete::Graph do
     end
 
     it 'raises a TypeError if the input includes an object of a non-Edge type' do
-      expect { directed_graph.add_edges!(directed_edges << 'This is not an edge') }.to raise_error TypeError
+      expect {
+        directed_graph.add_edges!(directed_edges << 'This is not an edge')
+      }.to raise_error TypeError
     end
 
     it 'raises a EdgeNotUnique if the input includes an edge that is already part of the edge set' do
@@ -172,7 +188,9 @@ describe Math::Discrete::Graph do
     end
 
     it 'raises a TypeError if the input is an object of non-Vertex type' do
-      expect { graph.remove_vertex! 'This is not a vertex' }.to raise_error TypeError
+      expect {
+        graph.remove_vertex! 'This is not a vertex'
+      }.to raise_error TypeError
     end
 
     it 'raises a VertexNotFound if the input is a vertex that is not part of the vertex set' do
@@ -200,7 +218,9 @@ describe Math::Discrete::Graph do
     end
 
     it 'raises a TypeError if the input is an object of non-Vertex type' do
-      expect { graph.remove_vertices! %w(This is not a vertex) }.to raise_error TypeError
+      expect {
+        graph.remove_vertices! %w(This is not a vertex)
+      }.to raise_error TypeError
     end
 
     it 'raises a VertexNotFound if the input is a vertex that is not part of the vertex set' do
@@ -222,7 +242,9 @@ describe Math::Discrete::Graph do
     end
 
     it 'raises a TypeError if the input is an object of non-Edge type' do
-      expect { graph.remove_edge! 'This is not a vertex' }.to raise_error TypeError
+      expect {
+        graph.remove_edge! 'This is not a vertex'
+      }.to raise_error TypeError
     end
 
     it 'raises an EdgeNotFound if the input is an edge that is not part of the edge set' do
@@ -244,7 +266,9 @@ describe Math::Discrete::Graph do
     end
 
     it 'raises a TypeError if the input includes an an object of non-Edge type' do
-      expect { graph.remove_edges! %w(This is not an edge) }.to raise_error TypeError
+      expect {
+        graph.remove_edges! %w(This is not an edge)
+      }.to raise_error TypeError
     end
 
     it 'raises an EdgeNotFound if the input includes an edge that is not part of the edge set' do
@@ -261,7 +285,7 @@ describe Math::Discrete::Graph do
     it 'returns the vertex with the given label in the vertex set' do
       result = graph.find_vertex_by_label! 1
 
-      expect(result).to be_a Vertex
+      expect(result).to be_an_instance_of Vertex
       expect(result.label).to eq 1
     end
 
@@ -276,8 +300,8 @@ describe Math::Discrete::Graph do
     let(:result) { graph.find_vertices_by_labels! *labels }
 
     it 'returns the vertices with the given labels in the vertex set' do
-      expect(result).to be_a Set
-      expect(result).to all be_a Vertex
+      expect(result).to be_an_instance_of Set
+      expect(result).to all be_an_instance_of Vertex
       expect(result.size).to be 2
       expect(result.map &:label).to contain_exactly *labels
     end
@@ -299,13 +323,13 @@ describe Math::Discrete::Graph do
     let(:undirected_result) { undirected_graph.find_edge_by_labels! *labels.entries.reverse }
 
     it 'returns the directed edge with the given labels in order in the edge set' do
-      expect(directed_result).to be_a Edge
+      expect(directed_result).to be_an_instance_of Edge
       expect(directed_result).to be_directed
       expect(directed_result.labels).to contain_exactly *labels
     end
 
     it 'returns the undirected edge with the given labels regardless of order in the edge set' do
-      expect(undirected_edge).to be_a Edge
+      expect(undirected_edge).to be_an_instance_of Edge
       expect(undirected_edge).not_to be_directed
       expect(undirected_result.labels).to contain_exactly *labels
     end
@@ -322,6 +346,17 @@ describe Math::Discrete::Graph do
 
     it 'returns a set of all the vertex labels' do
       expect(graph.vertex_labels).to contain_exactly *labels
+    end
+  end
+
+  describe '#edge_labels' do
+    let(:vertices) { Vertex::Set[*labels] }
+    let(:directed_edges) { Edge::Set::Directed[[*vertices]] }
+    let(:directed_graph) { Graph[vertices, directed_edges] }
+
+    it 'returns a set of all the edge labels' do
+      expect(directed_graph.edge_labels).to contain_exactly *directed_edges.map(&:labels)
+      expect(directed_graph.edge_labels).to be_an_instance_of Set
     end
   end
 

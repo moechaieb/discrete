@@ -39,7 +39,7 @@ class Math::Discrete::Graph::Vertex
 
   private
 
-  def add_adjacent_vertex(vertex, weight)
+  def add_adjacent_vertex(vertex, weight = 1)
     @adjacent_vertices.add vertex
     @edge_weights[vertex.label] = weight
   end
