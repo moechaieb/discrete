@@ -1,11 +1,10 @@
 class Math::Discrete::Graph::Path
   class InvalidPath < StandardError; end
 
-  attr_reader :edges
-
   private_class_method :new
   def initialize(edges = Set[])
-    @edges = edges
+    @edge_map = edges.map { |e| [[e.from.label, e.to.label], e] }.to_h
+    @vertex_map = vertices.map { |v| [v.label, v] }.to_h
   end
 
   def self.[](*edges)
@@ -15,23 +14,19 @@ class Math::Discrete::Graph::Path
   end
 
   def cyclical?
-    return false if @edges.empty?
+    return false if @edge_map.empty?
 
-    labels.first.first == labels.to_a.last.to_a.last
+    @edge_map.values.first.from == @edge_map.values.last.to
   end
 
-  def labels
-    Set[*@edges.map(&:labels)]
+  def edges
+    Set[*@edge_map.values]
   end
 
   def vertices
-    Set[*@edges.map(&:vertices).reduce(&:+)]
+    Set[*@edge_map.values.map(&:vertices).reduce(&:+)]
   end
   alias_method :nodes, :vertices
-
-  def length
-    @edges.size
-  end
 
   private
 

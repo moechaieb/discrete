@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Math::Discrete::Graph::Properties do
-  let(:directed_graph) { Graph[[1,2,3,4], [[1,2],[2,3],[3,1], [1,4], [4,2]]] }
+  let(:graph) { Graph[[1,2,3,4], [[1,2],[2,3],[3,1], [1,4], [4,2]]] }
   let(:complete_graph) { Graph[[*(1..5)], (1..5).to_a.permutation(2).to_a] }
   let(:even_cycle) { Graph[[*(1..10)], [*((1..10).each_cons(2).to_a << [10,1])]] }
   let(:odd_cycle) { Graph[[*(1..7)], [*((1..7).each_cons(2).to_a << [7,1])]] }
@@ -65,7 +65,7 @@ describe Math::Discrete::Graph::Properties do
     end
 
     it 'returns false if there is a vertex that is not adjacent to all other vertices in the graph' do
-      expect(directed_graph.satisfies? completeness).to be false
+      expect(graph.satisfies? completeness).to be false
     end
   end
 
@@ -77,7 +77,7 @@ describe Math::Discrete::Graph::Properties do
     end
 
     it 'returns false if there are two vertices that does not have the same number of adjacent vertices in the graph' do
-      expect(directed_graph.satisfies? regularity).to be false
+      expect(graph.satisfies? regularity).to be false
     end
   end
 end

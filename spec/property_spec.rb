@@ -40,7 +40,7 @@ describe Math::Discrete::Property do
     end
 
     it 'raises a TypeError if the satisfiability_test returns a non-Boolean result' do
-      graph = Graph.build
+      graph = Graph[]
 
       expect { bad_property.satisfied? graph }.to raise_error TypeError
     end
