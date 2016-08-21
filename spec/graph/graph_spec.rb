@@ -3,6 +3,61 @@ require 'spec_helper'
 describe Math::Discrete::Graph do
   let(:labels) { [1, 2] }
 
+  describe '#[]' do
+    skip
+  end
+
+  describe '#<<' do
+    context 'with a vertex' do
+      let(:graph) { Graph[] }
+      let(:vertex) { Vertex[labels.first] }
+
+      it 'adds the vertex to the vertex set' do
+        graph << vertex
+        expect(graph.vertex_set).to include vertex
+      end
+
+      it 'raises a TypeError if the input is not a Vertex' do
+        expect {
+          graph << 'This is not a vertex'
+        }.to raise_error TypeError
+      end
+
+      it 'raises a VertexNotUnique if the input is a vertex that is already in the vertex set' do
+        graph << vertex
+
+        expect {
+          graph << vertex
+        }.to raise_error Graph::VertexNotUnique
+      end
+    end
+
+    context 'with an edge' do
+      let(:vertices) { Vertex::Set[*labels] }
+      let(:graph) { Graph[vertices] }
+      let(:edge) { Edge[*vertices] }
+
+      it 'adds the edge to the edge set' do
+        graph << edge
+        expect(graph.edge_set).to include edge
+      end
+
+      it 'raises a EdgeNotUnique if the input is an edge that is already in the edge set' do
+        expect {
+          graph  << 'This is not an edge'
+        }.to raise_error TypeError
+      end
+
+      it 'raises a EdgeNotUnique if the input is a edge that is already in the edge set' do
+        graph << edge
+
+        expect {
+          graph << edge
+        }.to raise_error Graph::EdgeNotUnique
+      end
+    end
+  end
+
   describe '::[]' do
     let(:vertex_set) { Vertex::Set['A', 'B', 'C'] }
     let(:edge_set) do

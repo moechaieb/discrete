@@ -51,8 +51,8 @@ class Math::Discrete::Graph
 
       graph = new
 
-      graph.add_vertices! vertex_set
-      graph.add_edges! edge_set
+      graph.send :add_vertices!, vertex_set
+      graph.send :add_edges!, edge_set
 
       graph
     end
@@ -86,7 +86,51 @@ class Math::Discrete::Graph
   end
 
   def <<(vertex_or_edge)
+    case vertex_or_edge
+    when Edge
+      add_edge! vertex_or_edge
+    when Vertex
+      add_vertex! vertex_or_edge
+    else
+      raise TypeError, 'input must be of type Edge or Vertex'
+    end
+  end
 
+  def vertex_set
+    @vertex_map.values.to_set
+  end
+  alias_method :node_set, :vertex_set
+
+  def edge_set
+    @edge_map.values.to_set
+  end
+
+  def vertex_labels
+    @vertex_map.keys.to_set
+  end
+  alias_method :node_labels, :vertex_labels
+
+  def edge_labels
+    edge_set.map(&:labels).to_set
+  end
+
+  def weighted?
+    edge_set.any? &:weighted?
+  end
+
+  def satisfies?(property)
+    property_name = property.name.to_sym
+
+    return @properties[property_name] unless @properties[property_name].nil?
+
+    @properties[property_name] = property.satisfied? self
+    @properties.fetch property_name
+  end
+
+  def determine_properties!(properties = Properties::all)
+    properties.map { |property| satisfies? property }
+
+    @properties
   end
 
   def add_vertex!(vertex)
@@ -166,43 +210,6 @@ class Math::Discrete::Graph
     raise EdgeNotFound, "could not find a edge with labels=(#{ from_label },#{ to_label })" if result.nil?
 
     result
-  end
-
-  def vertex_set
-    @vertex_map.values.to_set
-  end
-  alias_method :node_set, :vertex_set
-
-  def edge_set
-    @edge_map.values.to_set
-  end
-
-  def vertex_labels
-    @vertex_map.keys.to_set
-  end
-  alias_method :node_labels, :vertex_labels
-
-  def edge_labels
-    edge_set.map(&:labels).to_set
-  end
-
-  def weighted?
-    edge_set.any? &:weighted?
-  end
-
-  def satisfies?(property)
-    property_name = property.name.to_sym
-
-    return @properties[property_name] unless @properties[property_name].nil?
-
-    @properties[property_name] = property.satisfied? self
-    @properties.fetch property_name
-  end
-
-  def determine_properties!(properties = Properties::all)
-    properties.map { |property| satisfies? property }
-
-    @properties
   end
 
   private
