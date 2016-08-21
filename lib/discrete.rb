@@ -4,14 +4,8 @@ require 'set'
 module Math::Discrete
   class TypeError < StandardError; end
 
-  class Property; end
-
   class Graph; end
-  module Graph::Properties; end
   module Graph::Predicates; end
-  module Graph::Algorithms; end
-  class Graph::Vertex; end
-  class Graph::Edge; end
 end
 
 require 'math/discrete/version'
@@ -22,8 +16,9 @@ require 'math/discrete/graph'
 require 'math/discrete/graph/predicates'
 require 'math/discrete/graph/vertex'
 require 'math/discrete/graph/edge'
+require 'math/discrete/graph/path'
 
-
+TypeError = Math::Discrete::TypeError
 Graph = Math::Discrete::Graph
 Vertex = Graph::Vertex
 Node = Vertex

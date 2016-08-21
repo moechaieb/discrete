@@ -36,18 +36,18 @@ describe Math::Discrete::Property do
     end
 
     it 'raises a TypeError if the method is called with a structure of the wrong type' do
-      expect { property.satisfied? 'This is not a graph.' }.to raise_error Math::Discrete::TypeError
+      expect { property.satisfied? 'This is not a graph.' }.to raise_error TypeError
     end
 
     it 'raises a TypeError if the satisfiability_test returns a non-Boolean result' do
       graph = Graph.build
 
-      expect { bad_property.satisfied? graph }.to raise_error Math::Discrete::TypeError
+      expect { bad_property.satisfied? graph }.to raise_error TypeError
     end
 
     it 'returns the result of the satisfiability_test if the structure and result types are correct' do
-      graph = Graph.build_from_labels vertex_labels: Set['a', 'b'], edge_labels: Set[%w(a b)]
-      other_graph = Graph.build_from_labels vertex_labels: Set['a', 'b', 'c'], edge_labels: Set[%w(a b), %w(b c)]
+      graph = Graph[['a', 'b'], [%w(a b)]]
+      other_graph = Graph[['a', 'b', 'c'], [%w(a b), %w(b c)]]
 
       expect(property).to be_satisfied(graph)
       expect(property).not_to be_satisfied(other_graph)

@@ -1,10 +1,10 @@
 require 'spec_helper'
 
 describe Math::Discrete::Graph::Edge do
-  let(:first_vertex) { Graph::Vertex.build_from_label 'A' }
-  let(:second_vertex) { Graph::Vertex.build_from_label 'B' }
-  let(:directed_edge) { described_class::Directed.build from: first_vertex, to: second_vertex }
-  let(:undirected_edge) { described_class::Undirected.build_between first_vertex, second_vertex }
+  let(:first_vertex) { Vertex['A'] }
+  let(:second_vertex) { Vertex['B'] }
+  let(:directed_edge) { Edge::Directed[first_vertex, second_vertex] }
+  let(:undirected_edge) { Edge::Undirected[first_vertex, second_vertex] }
 
   context '::Directed' do
     describe '::build' do
@@ -19,12 +19,12 @@ describe Math::Discrete::Graph::Edge do
       end
 
       it 'raises a TypeError when given objects of non-Vertex type as input' do
-        expect { described_class::Directed.build from: 'Not a vertex', to: second_vertex }.to raise_error Math::Discrete::TypeError
-        expect { described_class::Directed.build from: first_vertex, to: 'Not a vertex' }.to raise_error Math::Discrete::TypeError
+        expect { Edge::Directed['Not a vertex', second_vertex] }.to raise_error TypeError
+        expect { Edge::Directed[first_vertex, 'Not a vertex'] }.to raise_error TypeError
       end
 
       it 'raises a TypeError when given a non-numeric weight' do
-        expect { described_class::Directed.build from: 'Not a vertex', to: second_vertex, weight: '1' }.to raise_error Math::Discrete::TypeError
+        expect { Edge::Directed['Not a vertex', second_vertex, '1'] }.to raise_error TypeError
       end
     end
   end
@@ -42,20 +42,20 @@ describe Math::Discrete::Graph::Edge do
       end
 
       it 'raises a TypeError when given objects of non-Vertex type as input' do
-        expect { described_class::Undirected.build_between 'Not a vertex', second_vertex }.to raise_error Math::Discrete::TypeError
-        expect { described_class::Undirected.build_between first_vertex, 'Not a vertex' }.to raise_error Math::Discrete::TypeError
+        expect { Edge::Undirected['Not a vertex', second_vertex] }.to raise_error TypeError
+        expect { Edge::Undirected[first_vertex, 'Not a vertex'] }.to raise_error TypeError
       end
 
       it 'raises a TypeError when given a non-numeric weight' do
-        expect { described_class::Undirected.build_between 'Not a vertex', second_vertex, weight: '1' }.to raise_error Math::Discrete::TypeError
+        expect { Edge::Undirected['Not a vertex', second_vertex, '1'] }.to raise_error TypeError
       end
     end
   end
 
   describe '#==' do
-    let(:third_vertex) { Graph::Vertex.build_from_label 'B' }
-    let(:same_undirected_edge) { described_class::Undirected.build_between second_vertex, first_vertex }
-    let(:same_directed_edge) { described_class::Directed.build from: first_vertex, to: second_vertex }
+    let(:third_vertex) { Vertex['B'] }
+    let(:same_undirected_edge) { Edge::Undirected[second_vertex, first_vertex] }
+    let(:same_directed_edge) { Edge::Directed[first_vertex, second_vertex] }
 
     it 'returns false when undirected and other_edge is directed or vice versa' do
       expect(directed_edge).not_to eq undirected_edge
@@ -77,16 +77,16 @@ describe Math::Discrete::Graph::Edge do
     it 'returns a set of labels of the vertices connected by the edge' do
       labels = directed_edge.labels
 
-      expect(labels).to be_a Set
+      expect(labels).to be_an_instance_of Set
       expect(labels).to contain_exactly 'A', 'B'
     end
   end
 
-  describe '#to_set' do
+  describe '#vertices' do
     it 'returns a set of the vertices connected by the edge' do
-      vertices = directed_edge.to_set
+      vertices = directed_edge.vertices
 
-      expect(vertices).to be_a Set
+      expect(vertices).to be_an_instance_of Set
       expect(vertices).to contain_exactly first_vertex, second_vertex
     end
   end
