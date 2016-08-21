@@ -27,7 +27,7 @@ Structures:
 - [ ] Set Comprehensions (for sets of all other constructs)
 - [ ] Logic Propositions (first-order and second-order)
 - [x] Graphs
-- [ ] Graph Constructs (paths)
+- [x] Graph Constructs (paths)
 - [ ] Natural numbers and Integer numbers
 - [ ] Mappings (injections, surjections, bijections between two sets)
 

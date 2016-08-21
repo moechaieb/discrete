@@ -4,7 +4,23 @@ describe Math::Discrete::Graph do
   let(:labels) { [1, 2] }
 
   describe '#[]' do
-    skip
+    let(:graph) { Graph[[1, 2, 3], [[1, 2], [2, 3], [3, 1], [1, 3]]] }
+    let(:vertex_result) { graph[1] }
+    let(:edge_result) { graph[2, 3] }
+
+    it 'returns the vertex with the corresponding label' do
+      expect(vertex_result).to be_an_instance_of Vertex
+      expect(vertex_result.label).to be 1
+    end
+
+    it 'returns the edge with the corresponing labels' do
+      expect(edge_result).to be_an_instance_of Edge
+      expect(edge_result.labels).to contain_exactly 2, 3
+    end
+
+    it 'returns nil if no vertex or edge have the given labels' do
+      expect(graph['hello']).to be_nil
+    end
   end
 
   describe '#<<' do

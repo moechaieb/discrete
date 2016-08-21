@@ -61,21 +61,26 @@ class Math::Discrete::Graph
       raise TypeError, 'vertex_labels must be of type Set' unless vertex_labels.is_a? Set
       raise TypeError, 'edge_labels must be of type Set' unless edge_labels.is_a? Set
 
-      vertices = Vertex::Set[*vertex_labels]
+      graph = new
 
-      edges = edge_labels.map do |label_set|
-        from = vertices.find { |vertex| vertex.label == label_set.first }
-        to = vertices.find { |vertex| vertex.label == label_set.to_a[1] }
-        weight = label_set.to_a[2] || 1
+      graph.send :add_vertices!, Vertex::Set[*vertex_labels]
 
-        raise VertexNotFound, "could not find a vertex with label=#{ label_set.first }" if from.nil?
-        raise VertexNotFound, "could not find a vertex with label=#{ label_set.to_a.last }" if to.nil?
+      edge_labels.each do |label_set|
+        from_label, to_label, weight = label_set.entries
+
+        from = graph[from_label]
+        raise VertexNotFound, "could not find a vertex with label=#{ from_label }" if from.nil?
+
+        to = graph[to_label]
+        raise VertexNotFound, "could not find a vertex with label=#{ to_label }" if to.nil?
+
+        weight ||= 1
         raise TypeError, 'edge weight must be of a Numeric type' unless weight.is_a? Numeric
 
-        Edge[from, to, weight]
+        graph.add_edge! Edge[from, to, weight]
       end
 
-      build_from_sets vertex_set: Set[*vertices], edge_set: Set[*edges]
+      graph
     end
   end
 

@@ -37,26 +37,17 @@ describe Math::Discrete::Graph::Path do
     end
   end
 
-  describe '#labels' do
-    let(:labels) { path.labels }
-
-    it 'returns a Set of edge labels' do
-      expect(labels).to be_an_instance_of Set
-      expect(labels).to contain_exactly [1,2], [2,3], [3,4]
-    end
-  end
-
-  describe '#vertices, #nodes' do
-    it 'returns a Set vertices along the path' do
+  describe '#edges' do
+    it 'returns a Set of edges along the path' do
       expect(path.vertices).to be_an_instance_of Set
       expect(path.vertices).to contain_exactly *vertices
     end
   end
 
-  describe '#length' do
-    it 'returns the number of edges along the path' do
-      expect(Graph::Path[].length).to be 0
-      expect(path.length).to be 3
+  describe '#vertices, #nodes' do
+    it 'returns a Set of vertices along the path' do
+      expect(path.vertices).to be_an_instance_of Set
+      expect(path.vertices).to contain_exactly *vertices
     end
   end
 end
