@@ -48,7 +48,41 @@ Algorithms:
 
 ## Usage
 
-Work In Progress.
+#### Graphs
+```ruby
+# Initializing vertices and edges
+first_vertex = Vertex['a'] # Or Node['a']
+second_vertex = Vertex['b']
+edge = Edge[first_vertex, second_vertex]
+
+vertex_set = Vertex::Set['a', 'b', 'c', 'd'] # Or Node::Set['a', 'b', 'c', 'd']
+a, b, c, d = *vertex_set
+edge_set = Edge::Set[[a, b], [a, c], [a, d], [b, d], [c, d]]
+
+# Initializing graphs 
+graph = Graph[]
+graph << a
+graph << b
+graph << Edge[a,b]
+
+# You can initialize a graph with a vertex set and an edge set
+graph = Graph[vertex_set, edge_set]
+# Or directly with labels
+graph = Graph[['a', 'b', 'c', 'd'], ['a', 'b'], ['a', 'c'], ['a', 'd'], ['b', 'd'], ['c', 'd']]
+
+# Weighted graphs are supported as well, by adding a third argument to the edge constructor
+montreal, toronto = *Vertex::Set['Montreal', 'Toronto']
+edge = Edge[montreal, toronto, 506] # The distance between MTL and the 6IX is 506 kms
+
+map = Graph[
+  ['Montreal', 'Toronto', 'Boston'],
+  [
+    ['Montreal', 'Toronto', 506],
+    ['Toronto', 'Boston', 885],
+    ['Boston', 'Montreal', 405]
+  ]
+]
+```
 
 ## Development
 
