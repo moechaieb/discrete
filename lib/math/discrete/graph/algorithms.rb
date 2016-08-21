@@ -66,7 +66,7 @@ module Math::Discrete::Graph::Algorithms
 
     return Graph::Path[] if source == target
 
-    distance_tree = if @edge_set.map(&:weight).all? { |weight| weight > 0 }
+    distance_tree = if edge_set.map(&:weight).all? { |weight| weight > 0 }
       dijkstras_algorithm(source, target)
     else
       bellman_fords_algorithm(source, target)
@@ -123,7 +123,7 @@ module Math::Discrete::Graph::Algorithms
     end
 
     (vertex_set.size - 1).times do
-      @edge_set.each do |edge|
+      edge_set.each do |edge|
         alt = distance_tree[edge.from.label][:distance] + edge.weight
 
         if alt < distance_tree[edge.to.label][:distance]
@@ -132,7 +132,7 @@ module Math::Discrete::Graph::Algorithms
       end
     end
 
-    @edge_set.each do |edge|
+    edge_set.each do |edge|
       if distance_tree[edge.from.label][:distance] + edge.weight < distance_tree[edge.to.label][:distance]
         raise NegativeWeightCycleError, 'the graph contains a negative-weight cycle'
       end

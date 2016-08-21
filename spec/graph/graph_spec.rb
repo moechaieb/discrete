@@ -5,22 +5,16 @@ describe Math::Discrete::Graph do
 
   describe '::[]' do
     let(:vertex_set) { Vertex::Set['A', 'B', 'C'] }
-    let(:directed_edge_set) do
-      Edge::Set::Directed[
+    let(:edge_set) do
+      Edge::Set[
         [vertex_set.entries[0], vertex_set.entries[1]],
         [vertex_set.entries[1], vertex_set.entries[0]],
         [vertex_set.entries[1], vertex_set.entries[2]],
         [vertex_set.entries[2], vertex_set.entries[1]]
       ]
     end
-    let(:undirected_edge_set) do
-      Edge::Set::Undirected[
-        [vertex_set.entries[0], vertex_set.entries[1]],
-        [vertex_set.entries[1], vertex_set.entries[2]],
-      ]
-    end
-    let(:directed_graph_from_sets) { Graph[vertex_set, directed_edge_set] }
-    let(:undirected_graph_from_sets) { Graph[vertex_set, undirected_edge_set] }
+
+    let(:graph_from_sets) { Graph[vertex_set, edge_set] }
     let(:graph_from_labels) { Graph[[1, 2, 3], [[1, 2], [2, 3], [3, 1], [1, 3]]] }
 
     it 'raises a TypeError if the given vertex set or label set is not a Set or an Array' do
@@ -36,23 +30,14 @@ describe Math::Discrete::Graph do
     end
 
     it 'builds a graph from the given vertex set and edge set' do
-      expect(directed_graph_from_sets).to be_an_instance_of Graph
-      expect(directed_graph_from_sets.vertex_set).to eq vertex_set
-      expect(directed_graph_from_sets.edge_set).to eq directed_edge_set
+      expect(graph_from_sets).to be_an_instance_of Graph
+      expect(graph_from_sets.vertex_set).to eq vertex_set
+      expect(graph_from_sets.edge_set).to eq edge_set
     end
 
-    it 'builds a directed graph from the given vertex label set and edge label set' do
+    it 'builds a graph from the given vertex label set and edge label set' do
       expect(graph_from_labels).to be_an_instance_of Graph
-      expect(graph_from_labels).to be_directed
       expect(graph_from_labels.vertex_labels).to contain_exactly 1, 2, 3
-    end
-
-    it 'builds a directed or undirected graph based on the edge set' do
-      expect(directed_edge_set).to all be_directed
-      expect(directed_graph_from_sets).to be_directed
-
-      expect(undirected_edge_set).to all satisfy { |edge| !edge.directed? }
-      expect(undirected_graph_from_sets).not_to be_directed
     end
   end
 
@@ -106,74 +91,54 @@ describe Math::Discrete::Graph do
 
   describe '#add_edge!' do
     let(:vertices) { Vertex::Set[*labels] }
-    let(:directed_graph) { Graph[vertices, []] }
-    let(:undirected_graph) { Graph.build directed: false }
-    let(:directed_edge) { Edge::Directed[*vertices] }
-    let(:undirected_edge) { Edge::Undirected[*vertices] }
+    let(:graph) { Graph[vertices, []] }
+    let(:edge) { Edge[*vertices] }
 
     it 'adds the edge to the edge set' do
-      directed_graph.add_edge! directed_edge
-      expect(directed_graph.edge_set).to include directed_edge
+      graph.add_edge! edge
+      expect(graph.edge_set).to include edge
     end
 
     it 'raises a TypeError if the input is an object of a non-Edge type' do
       expect {
-        directed_graph.add_edge! 'This is not an edge'
+        graph.add_edge! 'This is not an edge'
       }.to raise_error TypeError
     end
 
     it 'raises a EdgeNotUnique if the edge is already part of the edge set' do
-      directed_graph.add_edge! directed_edge
+      graph.add_edge! edge
 
-      expect { directed_graph.add_edge! directed_edge }.to raise_error Graph::EdgeNotUnique
-    end
-
-    it 'raises a BadEdgeType if the edge is directed and the graph is undirected' do
-      expect { undirected_graph.add_edge! directed_edge }.to raise_error Graph::BadEdgeType
-    end
-
-    it 'raises a BadEdgeType if the edge is undirected and the graph is directed' do
-      expect { directed_graph.add_edge! undirected_edge }.to raise_error Graph::BadEdgeType
+      expect { graph.add_edge! edge }.to raise_error Graph::EdgeNotUnique
     end
   end
 
   describe '#add_edges!' do
     let(:vertices) { Vertex::Set[*labels] }
-    let(:directed_graph) { Graph[vertices] }
-    let(:undirected_graph) { Graph.build directed: false }
-    let(:directed_edges) { Edge::Set::Directed[[*vertices]] }
-    let(:undirected_edges) { Edge::Set::Undirected[[*vertices]] }
+    let(:graph) { Graph[vertices] }
+    let(:edges) { Edge::Set[[*vertices]] }
 
     it 'adds the edges to the edge set' do
-      directed_graph.add_edges! directed_edges
-      expect(directed_graph.edge_set).to include *directed_edges
+      graph.add_edges! edges
+      expect(graph.edge_set).to include *edges
     end
 
     it 'raises a TypeError if the input includes an object of a non-Edge type' do
       expect {
-        directed_graph.add_edges!(directed_edges << 'This is not an edge')
+        graph.add_edges!(edges << 'This is not an edge')
       }.to raise_error TypeError
     end
 
     it 'raises a EdgeNotUnique if the input includes an edge that is already part of the edge set' do
-      directed_graph.add_edge! directed_edges.first
+      graph.add_edge! edges.first
 
-      expect { directed_graph.add_edges! directed_edges }.to raise_error Graph::EdgeNotUnique
-    end
-
-    it 'raises a BadEdgeType if the edge is directed and the graph is undirected' do
-      expect { undirected_graph.add_edges! directed_edges }.to raise_error Graph::BadEdgeType
-    end
-
-    it 'raises a BadEdgeType if the edge is undirected and the graph is directed' do
-      expect { directed_graph.add_edges! undirected_edges }.to raise_error Graph::BadEdgeType
+      expect { graph.add_edges! edges }.to raise_error Graph::EdgeNotUnique
     end
   end
 
   describe '#remove_vertex!, #remove_node!' do
     let(:vertices) { Vertex::Set[*labels] }
     let(:vertex) { vertices.first }
-    let(:edges) { Edge::Set::Undirected[[*vertices]] }
+    let(:edges) { Edge::Set[[*vertices]] }
     let(:edge) { edges.first }
     let(:graph) { Graph[vertices, edges] }
 
@@ -203,7 +168,7 @@ describe Math::Discrete::Graph do
   describe '#remove_vertices!, #remove_nodes!' do
     let(:vertices) { Vertex::Set[*labels] }
     let(:vertex) { vertices.first }
-    let(:edges) { Edge::Set::Undirected[[*vertices]] }
+    let(:edges) { Edge::Set[[*vertices]] }
     let(:edge) { edges.first }
     let(:graph) { Graph[vertices, edges] }
 
@@ -232,7 +197,7 @@ describe Math::Discrete::Graph do
 
   describe '#remove_edge!' do
     let(:vertices) { Vertex::Set[*labels] }
-    let(:edges) { Edge::Set::Undirected[[*vertices]] }
+    let(:edges) { Edge::Set[[*vertices]] }
     let(:edge) { edges.first }
     let(:graph) { Graph[vertices, edges] }
 
@@ -248,7 +213,7 @@ describe Math::Discrete::Graph do
     end
 
     it 'raises an EdgeNotFound if the input is an edge that is not part of the edge set' do
-      foreign_edge = Edge::Undirected[*vertices]
+      foreign_edge = Edge[*vertices]
 
       expect { graph.remove_edge! foreign_edge }.to raise_error Graph::EdgeNotFound
     end
@@ -256,7 +221,7 @@ describe Math::Discrete::Graph do
 
   describe '#remove_edges!' do
     let(:vertices) { Vertex::Set[*labels] }
-    let(:edges) { Edge::Set::Undirected[[*vertices]] }
+    let(:edges) { Edge::Set[[*vertices]] }
     let(:edge) { edges.first }
     let(:graph) { Graph[vertices, edges] }
 
@@ -272,7 +237,7 @@ describe Math::Discrete::Graph do
     end
 
     it 'raises an EdgeNotFound if the input includes an edge that is not part of the edge set' do
-      foreign_edge = Edge::Undirected[*vertices]
+      foreign_edge = Edge[*vertices]
 
       expect { graph.remove_edges! [foreign_edge] }.to raise_error Graph::EdgeNotFound
     end
@@ -313,30 +278,18 @@ describe Math::Discrete::Graph do
 
   describe '#find_edge_by_labels!' do
     let(:vertices) { Vertex::Set[*labels] }
-    let(:directed_edges) { Edge::Set::Directed[[*vertices]] }
-    let(:directed_edge) { directed_edges.first }
-    let(:undirected_edges) { Edge::Set::Undirected[[*vertices]] }
-    let(:undirected_edge) { undirected_edges.first }
-    let(:directed_graph) { Graph[vertices, directed_edges] }
-    let(:undirected_graph) { Graph[vertices, undirected_edges] }
-    let(:directed_result) { directed_graph.find_edge_by_labels! *labels }
-    let(:undirected_result) { undirected_graph.find_edge_by_labels! *labels.entries.reverse }
+    let(:edges) { Edge::Set[[*vertices]] }
+    let(:edge) { edges.first }
+    let(:graph) { Graph[vertices, edges] }
+    let(:result) { graph.find_edge_by_labels! *labels }
 
-    it 'returns the directed edge with the given labels in order in the edge set' do
-      expect(directed_result).to be_an_instance_of Edge
-      expect(directed_result).to be_directed
-      expect(directed_result.labels).to contain_exactly *labels
-    end
-
-    it 'returns the undirected edge with the given labels regardless of order in the edge set' do
-      expect(undirected_edge).to be_an_instance_of Edge
-      expect(undirected_edge).not_to be_directed
-      expect(undirected_result.labels).to contain_exactly *labels
+    it 'returns the edge with the given labels in order in the edge set' do
+      expect(result).to be_an_instance_of Edge
+      expect(result.labels).to contain_exactly *labels
     end
 
     it 'raises EdgeNotFound if the edge set does not include an edge with the given labels' do
-      expect { directed_graph.find_edge_by_labels! 'X', 'Y' }.to raise_error Graph::EdgeNotFound
-      expect { undirected_graph.find_edge_by_labels! 'X', 'Y' }.to raise_error Graph::EdgeNotFound
+      expect { graph.find_edge_by_labels! 'X', 'Y' }.to raise_error Graph::EdgeNotFound
     end
   end
 
@@ -351,12 +304,12 @@ describe Math::Discrete::Graph do
 
   describe '#edge_labels' do
     let(:vertices) { Vertex::Set[*labels] }
-    let(:directed_edges) { Edge::Set::Directed[[*vertices]] }
-    let(:directed_graph) { Graph[vertices, directed_edges] }
+    let(:edges) { Edge::Set[[*vertices]] }
+    let(:graph) { Graph[vertices, edges] }
 
     it 'returns a set of all the edge labels' do
-      expect(directed_graph.edge_labels).to contain_exactly *directed_edges.map(&:labels)
-      expect(directed_graph.edge_labels).to be_an_instance_of Set
+      expect(graph.edge_labels).to contain_exactly *edges.map(&:labels)
+      expect(graph.edge_labels).to be_an_instance_of Set
     end
   end
 

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Math::Discrete::Graph::Path do
   let(:vertices) { Vertex::Set[1,2,3,4] }
   let(:edges) do
-    Edge::Set::Directed[
+    Edge::Set[
       [vertices.entries[0], vertices.entries[1]],
       [vertices.entries[1], vertices.entries[2]],
       [vertices.entries[2], vertices.entries[3]]
@@ -13,7 +13,7 @@ describe Math::Discrete::Graph::Path do
 
   describe '::[]' do
     it 'raises an InvalidPath if the given edges do not make a continuous path' do
-      edges.add Edge::Directed[vertices.entries[2], vertices.entries[0]]
+      edges.add Edge[vertices.entries[2], vertices.entries[0]]
 
       expect { Graph::Path[*edges] }.to raise_error Graph::Path::InvalidPath
     end
@@ -26,7 +26,7 @@ describe Math::Discrete::Graph::Path do
 
   describe '#cyclical?' do
     it 'returns true if the path ends in the same vertex that it starts with' do
-      edges.add Edge::Directed[vertices.entries[3], vertices.entries[0]]
+      edges.add Edge[vertices.entries[3], vertices.entries[0]]
       cycle = Graph::Path[*edges]
 
       expect(cycle).to be_cyclical
