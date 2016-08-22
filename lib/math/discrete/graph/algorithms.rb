@@ -1,4 +1,5 @@
 require 'algorithms'
+require 'union_find'
 
 module Math::Discrete::Graph::Algorithms
   class NegativeWeightCycleError < StandardError; end
@@ -80,6 +81,21 @@ module Math::Discrete::Graph::Algorithms
     end
 
     Graph::Path[*edges.reverse]
+  end
+
+  def minimum_spanning_tree
+    minimum_edge_set = Set[]
+    union_set = UnionFind::UnionFind.new Set[*vertex_set]
+
+    edge_set.sort_by(&:weight).each do |edge|
+      unless union_set.connected?(edge.from, edge.to)
+        minimum_edge_set.add edge
+
+        union_set.union(edge.from, edge.to)
+      end
+    end
+
+    Graph[vertex_set, minimum_edge_set]
   end
 
   private

@@ -144,4 +144,8 @@ describe Graph::Algorithms do
       }.to raise_error Graph::Algorithms::NegativeWeightCycleError
     end
   end
+
+  describe '#minimum_spanning_tree' do
+    skip
+  end
 end
