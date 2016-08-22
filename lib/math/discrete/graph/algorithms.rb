@@ -85,7 +85,7 @@ module Math::Discrete::Graph::Algorithms
 
   def minimum_spanning_tree
     minimum_edge_set = Set[]
-    union_set = UnionFind::UnionFind.new Set[*vertex_set]
+    union_set = UnionFind::UnionFind.new vertex_set
 
     edge_set.sort_by(&:weight).each do |edge|
       unless union_set.connected?(edge.from, edge.to)
