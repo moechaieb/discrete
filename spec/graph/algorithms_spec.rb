@@ -172,6 +172,7 @@ describe Graph::Algorithms do
       expect(mst).to be_an_instance_of Graph
       expect(mst.vertex_set).to eq graph.vertex_set
       expect(mst.edge_set.size).to be 6
+      expect(mst.edge_set.map(&:weight).reduce(:+)).to be 39
     end
   end
 end
