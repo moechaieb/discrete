@@ -1,11 +1,10 @@
 require 'spec_helper'
 
 describe Graph::Algorithms do
-  let(:empty_graph) { Graph[] }
-  let(:graph) { Graph[[1,2,3,4], [[1,2],[2,3],[3,1], [1,4], [4,2]]] }
-  let(:foreign_vertex) { Vertex['Z'] }
-
   describe '#breadth_first_search' do
+    let(:empty_graph) { Graph[] }
+    let(:graph) { Graph[[1,2,3,4], [[1,2],[2,3],[3,1], [1,4], [4,2]]] }
+    let(:foreign_vertex) { Vertex['Z'] }
     let(:search_tree) { graph.breadth_first_search }
 
     it 'returns an empty search tree if the graph is empty' do
@@ -52,6 +51,9 @@ describe Graph::Algorithms do
   end
 
   describe '#depth_first_search' do
+    let(:empty_graph) { Graph[] }
+    let(:graph) { Graph[[1,2,3,4], [[1,2],[2,3],[3,1], [1,4], [4,2]]] }
+    let(:foreign_vertex) { Vertex['X'] }
     let(:search_tree) { graph.depth_first_search }
 
     it 'returns an empty search tree if the graph is empty' do
@@ -142,6 +144,34 @@ describe Graph::Algorithms do
       expect {
         negative_weight_cycle_graph.shortest_path_between source, target
       }.to raise_error Graph::Algorithms::NegativeWeightCycleError
+    end
+  end
+
+  describe '#minimum_spanning_tree' do
+    let(:graph) do
+      Graph[
+        %w(A B C D E F G),
+        [
+          ['A', 'B', 7], ['B', 'A', 7],
+          ['A', 'D', 5], ['D', 'A', 5],
+          ['B', 'C', 8], ['C', 'B', 8],
+          ['B', 'D', 9], ['D', 'B', 9],
+          ['B', 'E', 7], ['E', 'B', 7],
+          ['C', 'E', 5], ['E', 'C', 5],
+          ['D', 'E', 15], ['E', 'D', 15],
+          ['D', 'F', 6], ['F', 'D', 6],
+          ['E', 'F', 8], ['F', 'E', 8],
+          ['F', 'G', 11], ['G', 'F', 11],
+          ['E', 'G', 9], ['G', 'E', 9],
+        ]
+      ]
+    end
+    let(:mst) { graph.minimum_spanning_tree }
+
+    it 'returns a valid minimum spanning tree' do
+      expect(mst).to be_an_instance_of Graph
+      expect(mst.vertex_set).to eq graph.vertex_set
+      expect(mst.edge_set.size).to be 6
     end
   end
 end
