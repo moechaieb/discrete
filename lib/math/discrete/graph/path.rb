@@ -1,5 +1,11 @@
-class Math::Discrete::Graph::Path
+class Math::Discrete::Graph::Path < Math::Discrete::Structure
   class InvalidPath < StandardError; end
+
+  property :cyclicality, adjective: :cyclical do |path|
+    next path.edges.empty?
+
+    path.edges.first.from == path.edges.last.to
+  end
 
   private_class_method :new
   def initialize(edges = Set[])
@@ -11,12 +17,6 @@ class Math::Discrete::Graph::Path
     raise InvalidPath, 'must be a valid continuous path' unless valid_path?(edges)
 
     new Set[*edges]
-  end
-
-  def cyclical?
-    return false if @edge_map.empty?
-
-    @edge_map.values.first.from == @edge_map.values.last.to
   end
 
   def edges

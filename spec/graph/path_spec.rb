@@ -24,16 +24,18 @@ describe Math::Discrete::Graph::Path do
     end
   end
 
-  describe '#cyclical?' do
-    it 'returns true if the path ends in the same vertex that it starts with' do
-      edges.add Edge[vertices.entries[3], vertices.entries[0]]
-      cycle = Graph::Path[*edges]
+  describe 'properties' do
+    describe '::cyclicality' do
+      it 'returns true if the path ends in the same vertex that it starts with' do
+        edges.add Edge[vertices.entries[3], vertices.entries[0]]
+        cycle = Graph::Path[*edges]
 
-      expect(cycle).to be_cyclical
-    end
+        expect(cycle).to be_cyclical
+      end
 
-    it 'returns false if the path is not a cycle' do
-      expect(path).not_to be_cyclical
+      it 'returns false if the path is not a cycle' do
+        expect(path).not_to be_cyclical
+      end
     end
   end
 

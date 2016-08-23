@@ -115,6 +115,21 @@ module Math::Discrete::Graph::Algorithms
     Graph[vertex_set, minimum_edge_set]
   end
 
+  def weakly_connected_components
+    # Return a set of weakly connected components as Graph objects
+    Set[]
+  end
+
+  def strongly_connected_components
+    # Return a set of weakly connected components as Graph objects
+    Set[]
+  end
+
+  def cycles
+    # Return a set of cycles as Path objects
+    Set[]
+  end
+
   private
 
   # Dijkstra's algorithm is an algorithm for finding the shortest paths between nodes in a graph.

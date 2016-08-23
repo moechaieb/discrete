@@ -175,4 +175,16 @@ describe Graph::Algorithms do
       expect(mst.edge_set.map(&:weight).reduce(:+)).to be 39
     end
   end
+
+  describe '#weakly_connected_components' do
+    skip
+  end
+
+  describe '#strongly_connected_components' do
+    skip
+  end
+
+  describe '#cycles' do
+    skip
+  end
 end

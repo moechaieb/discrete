@@ -27,13 +27,14 @@ Structures:
 - [ ] Set Comprehensions (for sets of all other constructs)
 - [ ] Logic Propositions (first-order and second-order)
 - [x] Graphs
-- [x] Graph Constructs (paths)
+- [x] Graph Constructs (paths, complete graphs, multipartite graphs, trees)
 - [ ] Natural numbers and Integer numbers
 - [ ] Mappings (injections, surjections, bijections between two sets)
 
 Algorithms:
 
 - Graph algorithms:
+  Implement traversal algorithms as enumerators whenever possible
   - Deterministic algorithms:
     - Breadth-first search
     - Depth-first search
@@ -48,7 +49,7 @@ Algorithms:
 Design:
  - Extract a `Math::Discrete::Structure` namespace that contains cross-structure methods and logic
  - Document every algorithm and property with relevant Wikipedia articles and papers
-
+ - Implement a `#properties_up_to_date?` method in `Math::Discrete::Structure`
 
 ## Usage
 

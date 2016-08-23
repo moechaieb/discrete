@@ -36,6 +36,11 @@ class Math::Discrete::Graph::Vertex
 
     label == other_vertex.label
   end
+  alias_method :eql?, :==
+
+  def hash
+    label.hash
+  end
 
   private
 

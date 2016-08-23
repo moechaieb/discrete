@@ -74,6 +74,10 @@ describe Math::Discrete::Graph do
     end
   end
 
+  describe '#to_undirected_graph' do
+    skip
+  end
+
   describe '::[]' do
     let(:vertex_set) { Vertex::Set['A', 'B', 'C'] }
     let(:edge_set) do
@@ -284,7 +288,7 @@ describe Math::Discrete::Graph do
     end
 
     it 'raises an EdgeNotFound if the input is an edge that is not part of the edge set' do
-      foreign_edge = Edge[*vertices]
+      foreign_edge = Edge[*vertices.to_a.reverse]
 
       expect { graph.remove_edge! foreign_edge }.to raise_error Graph::EdgeNotFound
     end
@@ -308,7 +312,7 @@ describe Math::Discrete::Graph do
     end
 
     it 'raises an EdgeNotFound if the input includes an edge that is not part of the edge set' do
-      foreign_edge = Edge[*vertices]
+      foreign_edge = Edge[*vertices.to_a.reverse]
 
       expect { graph.remove_edges! [foreign_edge] }.to raise_error Graph::EdgeNotFound
     end
@@ -440,6 +444,15 @@ describe Math::Discrete::Graph do
       it 'returns true if some edge has a different weight than another edge in the graph' do
         expect(weighted_graph).to be_weighted
       end
+    end
+
+    describe '::cyclicality' do
+    end
+
+    describe '::weak_connectivity' do
+    end
+
+    describe '::strong_connectivity' do
     end
   end
 end

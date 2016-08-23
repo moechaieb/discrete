@@ -16,7 +16,7 @@ class Math::Discrete::Graph::Edge
   end
 
   def self.[](from, to, weight = 1)
-    Edge.send :new, from: from, to: to, weight: weight
+    new from: from, to: to, weight: weight
   end
 
   module Set
@@ -36,8 +36,17 @@ class Math::Discrete::Graph::Edge
   def ==(other_edge)
     from == other_edge.from && to == other_edge.to
   end
+  alias_method :eql?, :==
+
+  def hash
+    labels.hash
+  end
 
   def weighted?
     @weight != 1
+  end
+
+  def reverse(weight: @weight)
+    Edge[to, from, weight]
   end
 end
