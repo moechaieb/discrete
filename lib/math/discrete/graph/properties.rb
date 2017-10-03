@@ -22,6 +22,10 @@ module Math::Discrete::Graph::Properties
       ]
     end
 
+    # A bipartite graph (or bigraph) is a graph whose vertices can be divided into two disjoint and independent sets
+    # U and V such that every edge connects a vertex in U to one in V.
+    # Read more:
+    # https://en.wikipedia.org/wiki/Bipartite_graph
     def bipartiteness
       Math::Discrete::Property.build name: :bipartiteness, adjective: :bipartite, structure_type: :graph do |graph|
         n = graph.vertex_set.size
@@ -51,6 +55,9 @@ module Math::Discrete::Graph::Properties
       end
     end
 
+    # A complete graph is a graph in which every pair of distinct vertices is connected by a unique edge.
+    # Read more:
+    # https://en.wikipedia.org/wiki/Complete_graph
     def completeness
       Math::Discrete::Property.build name: :completeness, adjective: :complete, structure_type: :graph do |graph|
         n = graph.vertex_set.size
@@ -60,6 +67,9 @@ module Math::Discrete::Graph::Properties
       end
     end
 
+    # A regular graph is a graph where each vertex has the same number of neighbors; i.e. every vertex has the same degree
+    # Read more:
+    # https://en.wikipedia.org/wiki/Regular_graph
     def regularity
       Math::Discrete::Property.build name: :regularity, adjective: :regular, structure_type: :graph do |graph|
         graph.vertex_set.map { |vertex| vertex.adjacent_vertices.size }.uniq.size == 1

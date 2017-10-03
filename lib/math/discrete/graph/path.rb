@@ -28,11 +28,10 @@ class Math::Discrete::Graph::Path
   end
   alias_method :nodes, :vertices
 
-  private
-
   def self.valid_path?(edges)
     edges.each_cons(2).all? do |initial_edge, following_edge|
       initial_edge.to == following_edge.from
     end
   end
+  private_class_method :valid_path?
 end

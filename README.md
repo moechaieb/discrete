@@ -18,7 +18,7 @@ Or install it yourself as:
 
     $ gem install discrete
 
-## Feature List
+## To-do
 
 This project is a work in progress and more structures and algorithms will be implemented:
 
@@ -45,6 +45,10 @@ Algorithms:
     - Graph Colouring
     - Traveling salesman
 
+Design:
+ - Extract a `Math::Discrete::Structure` namespace that contains cross-structure methods and logic
+ - Document every algorithm and property with relevant Wikipedia articles and papers
+
 
 ## Usage
 
@@ -59,7 +63,7 @@ vertex_set = Vertex::Set['a', 'b', 'c', 'd'] # Or Node::Set['a', 'b', 'c', 'd']
 a, b, c, d = *vertex_set
 edge_set = Edge::Set[[a, b], [a, c], [a, d], [b, d], [c, d]]
 
-# Initializing graphs 
+# Initializing graphs
 graph = Graph[]
 graph << a
 graph << b
