@@ -12,4 +12,4 @@ if ENV['CI'] == 'true'
   SimpleCov.formatter = SimpleCov::Formatter::Codecov
 end
 
-require 'discrete'
+require 'math/discrete'

@@ -384,62 +384,62 @@ describe Math::Discrete::Graph do
     end
   end
 
-  describe '#satisfies_property?' do
-    let(:property) { Graph::Properties.all.sample }
-    let(:graph) { Graph[] }
+  describe 'properties' do
+      let(:graph) { Graph[[1,2,3,4], [[1,2],[2,3],[3,1], [1,4], [4,2]]] }
+      let(:complete_graph) { Graph[[*(1..5)], (1..5).to_a.permutation(2).to_a] }
+      let(:even_cycle) { Graph[[*(1..10)], [*((1..10).each_cons(2).to_a << [10,1])]] }
+      let(:odd_cycle) { Graph[[*(1..7)], [*((1..7).each_cons(2).to_a << [7,1])]] }
+      let(:tree) { Graph[(1..7).to_a, [[1,2], [1,3], [2,4], [2,5], [3,6], [3,7]]] }
 
-    it 'caches results of previous queries' do
-      expect(property).to receive(:satisfied?).once
+    describe '::bipartiteness' do
+      it 'returns false early if the graph contains too many edges to possibly be bipartite' do
+        expect(complete_graph).to receive(:breadth_first_search).never
 
-      graph.satisfies? property
+        expect(complete_graph).not_to be_bipartite
+      end
 
-      expect(graph.properties).not_to be_empty
-      expect(graph.properties).to include property.name
+      it 'returns true if the graph is an even cycle' do
+        expect(even_cycle).to be_bipartite
+      end
+
+      it 'returns false if the graph is an odd cycle' do
+        expect(odd_cycle).not_to be_bipartite
+      end
+
+      it 'returns true if the graph is a tree' do
+        expect(tree).to be_bipartite
+      end
     end
 
-    it 'returns the cached value when possible' do
-      result = graph.satisfies? property
+    describe '::completeness' do
+      it 'returns true if and only if every vertex is adjacent to every other vertex in the graph' do
+        expect(complete_graph).to be_complete
+      end
 
-      expect(property).to receive(:satisfied?).never
-
-      expect(graph.satisfies? property).to be result
-    end
-  end
-
-  describe '#determine_properties!' do
-    let(:graph) { Graph[] }
-
-    it 'checks whether properties in Graph::Properties.all are verified by default' do
-      graph.determine_properties!
-
-      expect(graph.properties).to include *Graph::Properties.all.map(&:name)
+      it 'returns false if there is a vertex that is not adjacent to all other vertices in the graph' do
+        expect(graph).not_to be_complete
+      end
     end
 
-    it 'checks whether the given properties are verified' do
-      properties = Graph::Properties.all.sample 2
+    describe '::regularity' do
+      it 'returns true if each vertex has the same number of adjacent vertices as all other vertices in the graph' do
+        expect(even_cycle).to be_regular
+      end
 
-      graph.determine_properties! properties
-
-      expect(graph.properties).to include *properties.map(&:name)
-    end
-  end
-
-  describe '#weighted?' do
-    let(:graph) { Graph[labels, [labels]]}
-    let(:empty_graph) { Graph[] }
-
-    it 'returns true if the graph has weighted edges' do
-      graph.edge_set.first.weight = 5
-
-      expect(graph).to be_weighted
+      it 'returns false if there are two vertices that does not have the same number of adjacent vertices in the graph' do
+        expect(graph).not_to be_regular
+      end
     end
 
-    it 'returns false if the graph has no weighted edges' do
-      expect(graph).not_to be_weighted
-    end
+    describe '::weightedness' do
+      let(:weighted_graph) { Graph[[1,2], [[1,2,3], [2,1,2]]] }
+      it 'returns false if all edges of the graph have the same weight' do
+        expect(graph).not_to be_weighted
+      end
 
-    it 'returns false if the graph has no edges' do
-      expect(empty_graph).not_to be_weighted
+      it 'returns true if some edge has a different weight than another edge in the graph' do
+        expect(weighted_graph).to be_weighted
+      end
     end
   end
 end

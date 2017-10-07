@@ -1,20 +1,71 @@
-class Math::Discrete::Graph
+class Math::Discrete::Graph < Math::Discrete::Structure
   class VertexNotFound < StandardError; end
   class VertexNotUnique < StandardError; end
   class EdgeNotFound < StandardError; end
   class EdgeNotUnique < StandardError; end
 
   include Algorithms
-  include Predicates
 
-  attr_reader :properties
+  # A bipartite graph (or bigraph) is a graph whose vertices can be divided into two disjoint and independent sets
+  # U and V such that every edge connects a vertex in U to one in V.
+  # Read more:
+  # https://en.wikipedia.org/wiki/Bipartite_graph
+  property :bipartiteness, adjective: :bipartite do |graph|
+    n = graph.vertex_set.size
+    m = graph.edge_set.size
 
+    next false if m > (n * n) / 4
+
+    bfs_tree = graph.breadth_first_search
+
+    root_label = bfs_tree.empty? ? nil : bfs_tree.first[0]
+
+    bfs_tree = bfs_tree.to_a.reverse.to_h
+
+    super_parent = graph.vertex_set.find do |vertex|
+      vertex.adjacent_vertices.map(&:label).include? root_label
+    end
+
+    bfs_tree[root_label][:parent] = super_parent.label unless super_parent.nil?
+
+    bfs_tree.none? do |label, search_tree_data|
+      next if search_tree_data[:parent].nil?
+
+      bfs_tree[label][:color] = search_tree_data[:distance].odd? ? :blue : :red
+
+      bfs_tree[label][:color] == bfs_tree[search_tree_data[:parent]][:color]
+    end
+  end
+
+  # A complete graph is a graph in which every pair of distinct vertices is connected by a unique edge.
+  # Read more:
+  # https://en.wikipedia.org/wiki/Complete_graph
+  property :completeness, adjective: :complete do |graph|
+    n = graph.vertex_set.size
+    m = graph.edge_set.size
+
+    m == (n * (n - 1))
+  end
+
+  # A regular graph is a graph where each vertex has the same number of neighbors; i.e. every vertex has the same degree
+  # Read more:
+  # https://en.wikipedia.org/wiki/Regular_graph
+  property :regularity, adjective: :regular do |graph|
+    graph.vertex_set.map { |vertex| vertex.adjacent_vertices.size }.uniq.size == 1
+  end
+
+  property :weightedness, adjective: :weighted do |graph|
+    distinct_weights = graph.edge_set.map(&:weight).uniq.size
+
+    distinct_weights > 1
+  end
 
   private_class_method :new
   def initialize(vertex_set: Set[], edge_set: Set[])
     @vertex_map = vertex_set.map { |v| [v.label, v] }.to_h
     @edge_map = edge_set.map { |e| [[e.from.label, e.to.label], e] }.to_h
-    @properties = {}
+
+    super
   end
 
   def self.[](vertices_or_labels = Set[], edges_or_labels = Set[])
@@ -119,25 +170,6 @@ class Math::Discrete::Graph
     edge_set.map(&:labels).to_set
   end
 
-  def weighted?
-    edge_set.any? &:weighted?
-  end
-
-  def satisfies?(property)
-    property_name = property.name.to_sym
-
-    return @properties[property_name] unless @properties[property_name].nil?
-
-    @properties[property_name] = property.satisfied? self
-    @properties.fetch property_name
-  end
-
-  def determine_properties!(properties = Properties::all)
-    properties.map { |property| satisfies? property }
-
-    @properties
-  end
-
   def add_vertex!(vertex)
     raise TypeError, 'vertex must be of the type Math::Discrete::Graph::Vertex' unless vertex.is_a? Vertex
     raise VertexNotUnique, 'vertex labels must be unique' unless unique_vertex? vertex
@@ -225,9 +257,5 @@ class Math::Discrete::Graph
 
   def unique_edge?(edge)
     @edge_map[[edge.from.label, edge.to.label]].nil?
-  end
-
-  def clear_properties!
-    @properties = {}
   end
 end
