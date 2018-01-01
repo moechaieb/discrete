@@ -60,6 +60,22 @@ class Math::Discrete::Graph < Math::Discrete::Structure
     distinct_weights > 1
   end
 
+  property :cyclicality, adjective: :cyclical do |graph|
+    true
+  end
+
+  property :weak_connectivity, adjective: :weakly_connected do |graph|
+    false
+  end
+
+  property :strong_connectivity, adjective: :strongly_connected do |graph|
+    false
+  end
+
+  property :undirectedness, adjective: :undirected do |graph|
+    graph.to_undirected_graph.edge_set.map(&:labels) == graph.edge_set.map(&:labels)
+  end
+
   private_class_method :new
   def initialize(vertex_set: Set[], edge_set: Set[])
     @vertex_map = vertex_set.map { |v| [v.label, v] }.to_h
@@ -150,6 +166,12 @@ class Math::Discrete::Graph < Math::Discrete::Structure
     else
       raise TypeError, 'input must be of type Edge or Vertex'
     end
+  end
+
+  def to_undirected_graph
+    reverse_edge_set = edge_set.map(&:reverse)
+
+    Graph[vertex_set, (edge_set | reverse_edge_set)]
   end
 
   def vertex_set
@@ -247,6 +269,15 @@ class Math::Discrete::Graph < Math::Discrete::Structure
     raise EdgeNotFound, "could not find a edge with labels=(#{ from_label },#{ to_label })" if result.nil?
 
     result
+  end
+
+  def ==(other_graph)
+    vertex_set == other_graph.vertex_set && edge_set == other_graph.edge_set
+  end
+  alias_method :eql?, :==
+
+  def hash
+    Set[vertex_set, edge_set].hash
   end
 
   private

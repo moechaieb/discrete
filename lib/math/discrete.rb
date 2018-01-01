@@ -9,7 +9,6 @@ end
 require_relative 'discrete/property'
 require_relative 'discrete/structure'
 require_relative 'discrete/graph/algorithms'
-require_relative 'discrete/graph/properties'
 require_relative 'discrete/graph/vertex'
 require_relative 'discrete/graph/edge'
 require_relative 'discrete/graph/path'
